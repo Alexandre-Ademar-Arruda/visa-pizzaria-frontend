@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pizzas para Venda | Cardápio Online</title>
+    <meta name="description" content="Veja todas as pizzas disponíveis para venda. Cardápio online com fotos, ingredientes e preços de pizzas pequenas, médias e grandes.">
+    <style>
+        body {
+            background: #f0f0f0;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        main {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 16px;
+        }
+        h1 {
+            text-align: center;
+            margin: 24px 0 16px 0;
+            font-size: 2rem;
+        }
+        .pizza-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+        }
+        article.pizza-card {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 1px 6px rgba(0,0,0,0.08);
+            width: 100%;
+            max-width: 320px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: box-shadow 0.2s;
+            position: relative;
+        }
+        article.pizza-card:hover {
+            box-shadow: 0 4px 16px rgba(0,0,0,0.13);
+        }
+        .pizza-card img {
+            width: 100%;
+            max-width: 240px;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            background: #eee;
+            cursor: pointer;
+        }
+        .pizza-card h2 {
+            margin: 0 0 8px 0;
+            font-size: 1.3rem;
+            text-align: center;
+        }
+        /* Modal */
+        .modal-bg {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0; top: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-bg.active {
+            display: flex;
+        }
+        .modal {
+            background: #fff;
+            border-radius: 10px;
+            padding: 24px 18px;
+            max-width: 350px;
+            width: 95vw;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.18);
+            position: relative;
+            text-align: center;
+        }
+        .modal img {
+            width: 90%;
+            max-width: 220px;
+            height: 140px;
+            object-fit: cover;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            background: #eee;
+        }
+        .modal .fechar-modal {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #e53935;
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .precos-modal {
+            margin-bottom: 10px;
+            text-align: left; /* Alinha à esquerda */
+        }
+        .precos-modal button {
+            margin-left: 8px;
+            background: #43a047;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            padding: 2px 10px;
+            cursor: pointer;
+        }
+        .qtdInput {
+            width: 40px;
+            text-align: center;
+            margin: 0 5px;
+        }
+        .btnMenos, .btnMais {
+            background: #eee;
+            color: #333;
+            border: none;
+            border-radius: 4px;
+            padding: 2px 8px;
+            font-size: 1.1em;
+            cursor: pointer;
+        }
+        .btnDelSubtotal {
+            background: #e53935;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            padding: 2px 8px;
+            margin-left: 8px;
+            cursor: pointer;
+        }
+        .subtotal {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 1px 6px rgba(0,0,0,0.08);
+            max-width: 350px;
+            margin: 20px auto 0 auto;
+            padding: 12px;
+        }
+        .subtotal h3 {
+            margin: 0 0 8px 0;
+            font-size: 1.1rem;
+        }
+        .subtotal ul {
+            margin: 0;
+            padding-left: 18px;
+            font-size: 1rem;
+        }
+        .subtotal-total {
+            font-weight: bold;
+            margin-top: 8px;
+        }
+        @media (max-width: 700px) {
+            main {
+                padding: 4px;
+            }
+            .pizza-list {
+                flex-direction: column;
+                gap: 12px;
+            }
+            article.pizza-card {
+                max-width: 98vw;
+                padding: 10px;
+            }
+            .pizza-card img {
+                max-width: 98vw;
+                height: 140px;
+            }
+            .subtotal {
+                max-width: 98vw;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <h1>ViSa A Melhor Pizzaria</h1>
+        <section class="pizza-list" id="pizzaList"></section>
+    </main>
+
+    <!-- Modal oculto para mostrar detalhes da pizza -->
+    <div class="modal-bg" id="modalBg">
+        <div class="modal" id="modalPizza">
+            <button class="fechar-modal" id="fecharModal" aria-label="Fechar detalhes">-</button>
+            <img id="modalImg" src="" alt="">
+            <h2 id="modalNome"></h2>
+            <!-- ALTERAÇÃO: Preços alinhados à esquerda, controles de quantidade -->
+            <div class="precos-modal" id="modalPrecos"></div>
+            <div>
+                <strong>Ingredientes:</strong>
+                <ul id="modalIngredientes"></ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Subtotal (visualização rápida, não modal) -->
+    <!-- ALTERAÇÃO: Adicionado botão "Enviar Pedido no WhatsApp" na visualização rápida do subtotal -->
+    <div class="subtotal" id="subtotalBox" style="display:none;">
+        <h3>Subtotal</h3>
+        <ul id="subtotalList"></ul>
+        <div class="subtotal-total" id="subtotalTotal"></div>
+        <button id="btnEnviarZapSubtotal" style="margin-top:10px; background:#25d366; color:#fff;">Enviar Pedido no WhatsApp</button>
+    </div>
+
+    <!-- Modal do Subtotal -->
+    <div class="modal-bg" id="modalSubtotalBg">
+        <div class="modal" id="modalSubtotal">
+            <button class="fechar-modal" id="fecharSubtotalModal" aria-label="Fechar subtotal">-</button>
+            <h3>Subtotal</h3>
+            <ul id="modalSubtotalList"></ul>
+            <div class="subtotal-total" id="modalSubtotalTotal"></div>
+            <button id="btnAdicionarCarrinho" style="margin:10px 5px 0 0;">Adicionar ao Carrinho</button>
+            <button id="btnEnviarZap" style="margin:10px 0 0 5px; background:#25d366; color:#fff;">Enviar Pedido no WhatsApp</button>
+        </div>
+    </div>
+
+    <script>
+    // Subtotal global
+    let subtotal = [];
+
+    // ALTERAÇÃO: Função para mostrar o subtotal no modal, agora com botão de deletar cada pizza
+    function mostrarSubtotalModal() {
+        const modalSubtotalBg = document.getElementById('modalSubtotalBg');
+        const modalSubtotalList = document.getElementById('modalSubtotalList');
+        const modalSubtotalTotal = document.getElementById('modalSubtotalTotal');
+        modalSubtotalList.innerHTML = '';
+        let total = 0;
+        subtotal.forEach((item, idx) => {
+            modalSubtotalList.innerHTML += `
+                <li>
+                    ${item.nome} (${item.tamanho}): R$ ${item.valor}
+                    <button type="button" class="btnDelSubtotal" data-idx="${idx}">🗑️</button>
+                </li>
+            `;
+            total += parseFloat(item.valor.replace(',', '.')) || 0;
+        });
+        modalSubtotalTotal.textContent = "Total: R$ " + total.toFixed(2).replace('.', ',');
+        modalSubtotalBg.classList.add('active');
+
+        // Evento para deletar pizza do subtotal
+        document.querySelectorAll('.btnDelSubtotal').forEach(btn => {
+            btn.onclick = function() {
+                const idx = this.getAttribute('data-idx');
+                subtotal.splice(idx, 1);
+                atualizarSubtotal();
+                mostrarSubtotalModal();
+            }
+        });
+    }
+
+    // Função para fechar o modal do subtotal
+    function fecharSubtotalModal() {
+        document.getElementById('modalSubtotalBg').classList.remove('active');
+    }
+
+    // Função para atualizar o subtotal na tela (visualização rápida)
+    function atualizarSubtotal() {
+        const subtotalBox = document.getElementById('subtotalBox');
+        const subtotalList = document.getElementById('subtotalList');
+        const subtotalTotal = document.getElementById('subtotalTotal');
+        if (subtotal.length === 0) {
+            subtotalBox.style.display = 'none';
+            return;
+        }
+        subtotalBox.style.display = 'block';
+        subtotalList.innerHTML = '';
+        let total = 0;
+        subtotal.forEach(item => {
+            subtotalList.innerHTML += `<li>${item.nome} (${item.tamanho}): R$ ${item.valor}</li>`;
+            total += parseFloat(item.valor.replace(',', '.')) || 0;
+        });
+        subtotalTotal.textContent = "Total: R$ " + total.toFixed(2).replace('.', ',');
+    }
+
+    // ALTERAÇÃO: Função para abrir o modal e preencher os dados da pizza com controles de quantidade
+    function abrirModal(pizza) {
+        document.getElementById('modalImg').src = "http://localhost:3001" + pizza.imagem;
+        document.getElementById('modalImg').alt = "Pizza " + pizza.nome;
+        document.getElementById('modalNome').textContent = pizza.nome;
+
+        // Cria controles para cada tamanho
+        const tamanhos = [
+            { nome: 'Pequena', valor: pizza.preco.pequeno || '0' },
+            { nome: 'Média', valor: pizza.preco.medio || '0' },
+            { nome: 'Grande', valor: pizza.preco.grande || '0' }
+        ];
+        let html = '';
+        tamanhos.forEach((t, idx) => {
+            html += `
+            <div style="display:flex;align-items:center;margin-bottom:8px;">
+                <span style="width:80px;"><strong>${t.nome}:</strong> R$ ${t.valor}</span>
+                <button type="button" class="btnMenos" data-idx="${idx}">-</button>
+                <input type="number" min="0" value="0" class="qtdInput" data-idx="${idx}">
+                <button type="button" class="btnMais" data-idx="${idx}">+</button>
+                <button type="button" class="btnAddSubtotal" data-idx="${idx}" style="margin-left:10px;">Adicionar</button>
+            </div>
+            `;
+        });
+        document.getElementById('modalPrecos').innerHTML = html;
+        document.getElementById('modalIngredientes').innerHTML =
+            pizza.ingredientes.split(',').map(i => `<li>${i.trim()}</li>`).join('');
+        document.getElementById('modalBg').classList.add('active');
+
+        // Eventos dos botões + e -
+        document.querySelectorAll('.btnMais').forEach(btn => {
+            btn.onclick = function() {
+                const idx = this.getAttribute('data-idx');
+                const input = document.querySelector(`.qtdInput[data-idx="${idx}"]`);
+                input.value = parseInt(input.value) + 1;
+            }
+        });
+        document.querySelectorAll('.btnMenos').forEach(btn => {
+            btn.onclick = function() {
+                const idx = this.getAttribute('data-idx');
+                const input = document.querySelector(`.qtdInput[data-idx="${idx}"]`);
+                input.value = Math.max(0, parseInt(input.value) - 1);
+            }
+        });
+        // Botão Adicionar: adiciona ao subtotal a quantidade escolhida
+        document.querySelectorAll('.btnAddSubtotal').forEach(btn => {
+            btn.onclick = function() {
+                const idx = this.getAttribute('data-idx');
+                const input = document.querySelector(`.qtdInput[data-idx="${idx}"]`);
+                const qtd = parseInt(input.value);
+                if (qtd > 0) {
+                    for (let i = 0; i < qtd; i++) {
+                        window.adicionarSubtotal(pizza.nome, tamanhos[idx].nome, tamanhos[idx].valor);
+                    }
+                    fecharModal();
+                    mostrarSubtotalModal();
+                } else {
+                    alert('Escolha uma quantidade maior que zero!');
+                }
+            }
+        });
+    }
+
+    // Função global para adicionar ao subtotal (precisa ser global por causa do onclick)
+    window.adicionarSubtotal = function(nome, tamanho, valor) {
+        subtotal.push({ nome, tamanho, valor });
+        atualizarSubtotal();
+        fecharModal();   // Fecha o modal da pizza
+        mostrarSubtotalModal(); // Mostra o modal do subtotal ao adicionar
+    }
+
+    // Função para fechar o modal da pizza
+    function fecharModal() {
+        document.getElementById('modalBg').classList.remove('active');
+    }
+
+    // Função para montar mensagem do pedido e abrir o WhatsApp
+    function enviarPedidoZap() {
+        if (subtotal.length === 0) return;
+        let mensagem = "Olá! Quero pedir:\n";
+        subtotal.forEach(item => {
+            mensagem += `- ${item.nome} (${item.tamanho}): R$ ${item.valor}\n`;
+        });
+        let total = subtotal.reduce((acc, item) => acc + (parseFloat(item.valor.replace(',', '.')) || 0), 0);
+        mensagem += `Total: R$ ${total.toFixed(2).replace('.', ',')}`;
+        // Troque o número abaixo pelo número da pizzaria com DDD, só números
+        let numero = "5511995424085";
+        let url = `https://wa.me/${numero}?text=${encodeURIComponent(mensagem)}`;
+        window.open(url, '_blank');
+    }
+
+    // Carrega as pizzas e monta os cards
+    async function carregarPizzas() {
+        const resp = await fetch('http://localhost:3001/api/pizzas');
+        const pizzas = await resp.json();
+        const pizzaList = document.getElementById('pizzaList');
+        pizzaList.innerHTML = '';
+        pizzas.forEach((pizza, idx) => {
+            pizzaList.innerHTML += `
+                <article class="pizza-card" itemscope itemtype="https://schema.org/Product">
+                    <img src="http://localhost:3001${pizza.imagem}" alt="Pizza ${pizza.nome}" itemprop="image" data-idx="${idx}">
+                    <h2 itemprop="name">${pizza.nome}</h2>
+                </article>
+            `;
+        });
+
+        // Adiciona evento de clique à imagem de cada pizza para abrir o modal
+        document.querySelectorAll('.pizza-card img').forEach(img => {
+            img.addEventListener('click', function() {
+                const idx = this.getAttribute('data-idx');
+                abrirModal(pizzas[idx]);
+            });
+        });
+    }
+
+    // Eventos e inicialização
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('fecharModal').addEventListener('click', fecharModal);
+        document.getElementById('modalBg').addEventListener('click', function(e) {
+            if (e.target === this) fecharModal();
+        });
+        document.getElementById('fecharSubtotalModal').addEventListener('click', fecharSubtotalModal);
+        document.getElementById('modalSubtotalBg').addEventListener('click', function(e) {
+            if (e.target === this) fecharSubtotalModal();
+        });
+        document.getElementById('btnAdicionarCarrinho').addEventListener('click', function() {
+            fecharSubtotalModal();
+            alert('Itens adicionados ao carrinho!'); // Aqui você pode implementar lógica de carrinho real se quiser
+        });
+        document.getElementById('btnEnviarZap').addEventListener('click', enviarPedidoZap);
+        // ALTERAÇÃO: Evento para botão do subtotal rápido
+        document.getElementById('btnEnviarZapSubtotal').addEventListener('click', enviarPedidoZap);
+        carregarPizzas();
+    });
+    </script>
+</body>
+</html>

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pizza Cadastro</title>
+    <style>
+        *{
+            box-sizing: border-box;
+            margin:0;
+            padding:0;
+        }
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content:center;
+            height: 100vh;
+            width: 100vw;
+            background-color: #f0f0f0;
+            font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+        }
+        #pizzaForm {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            max-width: 300px;
+            padding: 10px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        #imagemContainer {
+            width: 100%;
+            max-width: 300px;
+            height: auto;
+            display: flex;
+            flex-direction:column;
+            align-items: center;
+            justify-content:center;
+        }
+        figure {
+            width: 100%;
+            max-width: 300px;
+            height: auto;
+            display: flex;    
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        textarea, input, button {
+            width: 90%;
+            padding: 5px;
+            margin: 5px;
+        }
+        textarea {
+            min-height: 4em;
+            max-height: 6em ;
+            resize: vertical;
+        }
+        button {
+            margin-top: 10px;          
+        }
+    </style>
+</head>
+<body>
+    <form id="pizzaForm" enctype="multipart/form-data">
+        <div id="infoPizza" class="pizzaGroup">
+            <label for="nome">Nome da Pizza:</label>
+            <input type="text" id="nome" name="nome" required>
+            <label for="ingredientes">Ingredientes:</label>
+            <textarea id="ingredientes" name="ingredientes" required rows="2"></textarea>
+            <!-- Corrigido: nomes diferentes para cada preço -->
+            <input type="text" id="preco_pequeno" name="preco_pequeno" placeholder="Preço Pizza Pequena (R$)" required>
+            <input type="text" id="preco_medio" name="preco_medio" placeholder="Preço Pizza Média (R$)" required>
+            <input type="text" id="preco_grande" name="preco_grande" placeholder="Preço Pizza Grande (R$)" required>
+        </div>
+        <div id="imagemContainer" class="pizzaGroup">
+            <figure>
+                <figcaption>Pizza Nome</figcaption>
+                <input type="file" id="imagem" name="imagem" accept="image/*" required>
+                <img src="" alt="" srcset="">
+            </figure>
+        </div>
+        <button type="submit">Cadastrar Pizza</button>
+    </form>
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const inputImagem = document.getElementById("imagem");
+        const imgPreview = document.querySelector('#imagemContainer img');
+        const form = document.getElementById("pizzaForm");
+
+        // Pré-visualização da imagem
+        inputImagem.addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    imgPreview.src = e.target.result;
+                    imgPreview.alt = file.name;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Envio do formulário via fetch
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault(); // Impede o recarregamento da página
+            const formData = new FormData(form);
+
+            try {
+                const response = await fetch('http://localhost:3001/api/pizzas', {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await response.json();
+                if (response.ok) {
+                    alert(result.message || "Pizza cadastrada com sucesso!");
+                    form.reset();
+                    imgPreview.src = "";
+                    imgPreview.alt = "";
+                } else {
+                    alert(result.error || "Erro ao cadastrar pizza.");
+                }
+            } catch (err) {
+                alert("Erro de conexão com o servidor.");
+            }
+        });
+    });
+    </script>
+</body>
+</html>
