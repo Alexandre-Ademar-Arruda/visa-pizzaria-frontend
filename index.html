@@ -40,6 +40,7 @@
             align-items: center;
             transition: box-shadow 0.2s;
             position: relative;
+            box-sizing: border-box;
         }
         article.pizza-card:hover {
             box-shadow: 0 4px 16px rgba(0,0,0,0.13);
@@ -378,18 +379,20 @@
     }
 
         // Carrega as pizzas e monta os cards
+        // Carrega as pizzas e monta os cards
     async function carregarPizzas() {
         const resp = await fetch('https://visa-pizzaria-backend.onrender.com/api/pizzas');
         const pizzas = await resp.json();
         const pizzaList = document.getElementById('pizzaList');
         pizzaList.innerHTML = '';
         pizzas.forEach((pizza, idx) => {
-            // CORREÇÃO: Verifica se existe imagem, se não mostra "Sem imagem"
+            // Adiciona onerror para tentar recarregar a imagem após 4 segundos se falhar (Render hibernando)
             pizzaList.innerHTML += `
                 <article class="pizza-card" itemscope itemtype="https://schema.org/Product">
                     ${
                         pizza.imagem
-                            ? `<img src="https://visa-pizzaria-backend.onrender.com${pizza.imagem}" alt="Pizza ${pizza.nome}" itemprop="image" data-idx="${idx}">`
+                            ? `<img src="https://visa-pizzaria-backend.onrender.com${pizza.imagem}" alt="Pizza ${pizza.nome}" itemprop="image" data-idx="${idx}" 
+                                onerror="setTimeout(() => { this.src='https://visa-pizzaria-backend.onrender.com${pizza.imagem}'; }, 4000)">`
                             : `<div style="width:240px;height:180px;background:#eee;display:flex;align-items:center;justify-content:center;">Sem imagem</div>`
                     }
                     <h2 itemprop="name">${pizza.nome}</h2>
