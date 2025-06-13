@@ -30,6 +30,16 @@
             padding: 12px;
             display:none;            /* só aparece quando houver itens */
         }
+
+        /* botão de remover item (modal e subtotal rápido) */
+        .btnDelSubtotal {
+            background: transparent;     /* sem fundo – fica só o emoji */
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            margin-left: 6px;
+        }
+
         .subtotal h3 {font-size:1.1rem;margin-bottom:8px}
         .subtotal ul {padding-left:18px;font-size:1rem}
         .subtotal-total {font-weight:bold;margin-top:8px}
@@ -152,27 +162,45 @@
     let subtotal=[];
 
     /* --------------- FUNÇÕES --------------- */
-    function atualizarSubtotal(){
-        const subtotalBox=document.getElementById('subtotalBox');
-        const subtotalList=document.getElementById('subtotalList');
-        const subtotalTotal=document.getElementById('subtotalTotal');
+    function atualizarSubtotal () {
+        const subtotalBox   = document.getElementById('subtotalBox');
+        const subtotalList  = document.getElementById('subtotalList');
+        const subtotalTotal = document.getElementById('subtotalTotal');
 
-        if(subtotal.length===0){
-            subtotalBox.style.display='none';
+        /* se não houver itens, some com o box e retire a margem extra do <main> */
+        if (subtotal.length === 0) {
+            subtotalBox.style.display = 'none';
             document.body.classList.remove('comSubtotal');
             return;
         }
-        subtotalBox.style.display='block';
+
+        /* mostra o box e empurra o conteúdo para baixo */
+        subtotalBox.style.display = 'block';
         document.body.classList.add('comSubtotal');
 
-        subtotalList.innerHTML='';
-        let total=0;
-        subtotal.forEach(item=>{
-            subtotalList.innerHTML+=`<li>${item.nome} (${item.tamanho}): R$ ${item.valor}</li>`;
-            total+=parseFloat(item.valor.replace(',','.'))||0;
+        /* monta a lista com botão 🗑️ */
+        subtotalList.innerHTML = '';
+        let total = 0;
+        subtotal.forEach((item, idx) => {
+            subtotalList.innerHTML += `
+                <li>
+                    ${item.nome} (${item.tamanho}): R$ ${item.valor}
+                    <button type="button" class="btnDelSubtotal" data-idx="${idx}">🗑️</button>
+                </li>`;
+            total += parseFloat(item.valor.replace(',', '.')) || 0;
         });
-        subtotalTotal.textContent='Total: R$ '+total.toFixed(2).replace('.',',');
+        subtotalTotal.textContent = 'Total: R$ ' + total.toFixed(2).replace('.', ',');
+
+        /* adiciona eventos de remoção */
+        document.querySelectorAll('.btnDelSubtotal').forEach(btn => {
+            btn.onclick = function () {
+                const idx = this.getAttribute('data-idx');
+                subtotal.splice(idx, 1);   // remove do array
+                atualizarSubtotal();       // redesenha a lista e total
+            };
+        });
     }
+
 
     function mostrarSubtotalModal(){
         const bg=document.getElementById('modalSubtotalBg');
