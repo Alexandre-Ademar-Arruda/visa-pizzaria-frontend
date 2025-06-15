@@ -4,16 +4,83 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bebidas | ViSa Pizzaria</title>
-    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="main.css">
+    <style>
+        .modal-bg {
+            display: none;
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.5);
+            justify-content: center; align-items: center;
+            z-index: 1000;
+        }
+        .modal-bg.active { display: flex; }
+        .modal {
+            background: #fff;
+            border-radius: 10px;
+            padding: 24px 18px;
+            max-width: 350px;
+            width: 95vw;
+            box-shadow: 0 4px 24px rgba(0,0,0,.18);
+            position: relative;
+            text-align: center;
+        }
+        .fechar-modal {
+            position: absolute; top: 10px; right: 10px;
+            background: none; border: none; font-size: 1.5rem; cursor: pointer;
+        }
+        .modal ul { list-style: none; padding: 0; }
+        .modal li { margin: 10px 0; }
+    </style>
 </head>
 <body>
     <h1>Bebidas</h1>
-    <p>Bem-vindo à seção de bebidas da ViSa Pizzaria! Aqui você encontra uma seleção refrescante para acompanhar sua refeição.</p>
-    <ul>
-        <li>🥤 Refrigerantes</li>
-        <li>🍺 Cervejas</li>
-        <li>🍹 Sucos</li>
-        <li>🍵 Chás</li>
+    <ul id="bebidaCategorias">
+        <li data-tipo="Refrigerante">🥤 Refrigerantes</li>
+        <li data-tipo="Cerveja">🍺 Cervejas</li>
+        <li data-tipo="Suco">🍹 Sucos</li>
+        <li data-tipo="Chá">🍵 Chás</li>
     </ul>
+
+    <!-- Modal -->
+    <div class="modal-bg" id="modalBebidas">
+        <div class="modal">
+            <button class="fechar-modal" id="fecharModal" aria-label="Fechar">✖️</button>
+            <h2 id="modalTitulo"></h2>
+            <ul id="listaBebidas"></ul>
+        </div>
+    </div>
+
+    <script>
+    // Função para abrir o modal e buscar bebidas do tipo selecionado
+    document.querySelectorAll('#bebidaCategorias li').forEach(li => {
+        li.onclick = async function() {
+            const tipo = this.dataset.tipo;
+            document.getElementById('modalTitulo').textContent = this.textContent;
+            document.getElementById('listaBebidas').innerHTML = 'Carregando...';
+
+            // Busca bebidas do tipo selecionado
+            const resp = await fetch('https://visa-pizzaria-backend.onrender.com/api/bebidas');
+            const bebidas = await resp.json();
+            // Filtra pelo tipo
+            const filtradas = bebidas.filter(b => b.tipo && b.tipo.toLowerCase() === tipo.toLowerCase());
+            if (filtradas.length === 0) {
+                document.getElementById('listaBebidas').innerHTML = '<li>Nenhuma bebida cadastrada.</li>';
+            } else {
+                document.getElementById('listaBebidas').innerHTML = filtradas.map(b =>
+                    `<li>${b.nome} - R$ ${b.preco}${b.imagem ? `<br><img src="https://visa-pizzaria-backend.onrender.com${b.imagem}" alt="${b.nome}" style="max-width:80px;">` : ''}</li>`
+                ).join('');
+            }
+            document.getElementById('modalBebidas').classList.add('active');
+        };
+    });
+
+    // Fecha o modal
+    document.getElementById('fecharModal').onclick = function() {
+        document.getElementById('modalBebidas').classList.remove('active');
+    };
+    document.getElementById('modalBebidas').onclick = function(e) {
+        if (e.target === this) this.classList.remove('active');
+    };
+    </script>
 </body>
 </html>
