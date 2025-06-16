@@ -6,6 +6,13 @@
     <title>Bebidas | ViSa Pizzaria</title>
     <link rel="stylesheet" href="main.css">
     <style>
+        /* Oculta os subitens inicialmente */
+        .subitens { 
+            display: none; 
+            padding-left: 20px;
+        }
+        
+        /* Estilização básica do modal */
         .modal-bg {
             display: none;
             position: fixed; inset: 0;
@@ -14,6 +21,7 @@
             z-index: 1000;
         }
         .modal-bg.active { display: flex; }
+        
         .modal {
             background: #fff;
             border-radius: 10px;
@@ -24,63 +32,100 @@
             position: relative;
             text-align: center;
         }
+        
         .fechar-modal {
             position: absolute; top: 10px; right: 10px;
             background: none; border: none; font-size: 1.5rem; cursor: pointer;
         }
-        .modal ul { list-style: none; padding: 0; }
-        .modal li { margin: 10px 0; }
+
+        /* Ajuste da imagem no modal */
+        #modalImg {
+            max-width: 120px;
+            max-height: 120px;
+            margin: 10px auto;
+            display: block;
+            border-radius: 8px;
+            background: #eee;
+        }
     </style>
 </head>
 <body>
     <h1>Bebidas</h1>
     <ul id="bebidaCategorias">
-        <li data-tipo="Refrigerante">🥤 Refrigerantes</li>
-        <li data-tipo="Cerveja">🍺 Cervejas</li>
-        <li data-tipo="Suco">🍹 Sucos</li>
-        <li data-tipo="Chá">🍵 Chás</li>
+        <li data-tipo="Refrigerante">🥤 Refrigerantes
+            <ul class="subitens">
+                <li class="item" data-nome="Coca-Cola" data-preco="5,00" data-imagem="https://visa-pizzaria-backend.onrender.com/uploads/coca.jpg">Coca-Cola - R$5,00</li>
+                <li class="item" data-nome="Fanta" data-preco="4,50" data-imagem="https://visa-pizzaria-backend.onrender.com/uploads/fanta.jpg">Fanta - R$4,50</li>
+            </ul>
+        </li>
+        <li data-tipo="Cerveja">🍺 Cervejas
+            <ul class="subitens">
+                <li class="item" data-nome="Original" data-preco="7,00" data-imagem="https://visa-pizzaria-backend.onrender.com/uploads/original.jpg">Original - R$7,00</li>
+                <li class="item" data-nome="Skol" data-preco="6,50" data-imagem="https://visa-pizzaria-backend.onrender.com/uploads/skol.jpg">Skol - R$6,50</li>
+            </ul>
+        </li>
     </ul>
 
-    <!-- Modal -->
-    <div class="modal-bg" id="modalBebidas">
+    <!-- Modal de detalhes -->
+    <div class="modal-bg" id="modalGlobal">
         <div class="modal">
-            <button class="fechar-modal" id="fecharModal" aria-label="Fechar">✖️</button>
-            <h2 id="modalTitulo"></h2>
-            <ul id="listaBebidas"></ul>
+            <button class="fechar-modal" id="fecharModalGlobal" aria-label="Fechar">✖️</button>
+            <h2 id="modalNome"></h2>
+            <img id="modalImg" src="" alt="">
+            <div>
+                <strong>Preço unitário:</strong> R$ <span id="modalPreco"></span>
+            </div>
+            <div style="margin:14px 0;">
+                <button id="btnMenos">-</button>
+                <input type="number" id="modalQtd" value="1" min="1">
+                <button id="btnMais">+</button>
+            </div>
+            <div>
+                <strong>Subtotal:</strong> R$ <span id="modalSubtotal"></span>
+            </div>
+            <button id="btnAdicionarCarrinho">Adicionar ao Carrinho</button>
         </div>
     </div>
 
     <script>
-    // Função para abrir o modal e buscar bebidas do tipo selecionado
-    document.querySelectorAll('#bebidaCategorias li').forEach(li => {
-        li.onclick = async function() {
-            const tipo = this.dataset.tipo;
-            document.getElementById('modalTitulo').textContent = this.textContent;
-            document.getElementById('listaBebidas').innerHTML = 'Carregando...';
+        // Exibir/ocultar subitens ao clicar na categoria
+        document.querySelectorAll("#bebidaCategorias > li").forEach(categoria => {
+            categoria.addEventListener("click", function() {
+                const sublista = this.querySelector(".subitens");
+                if (sublista) sublista.style.display = sublista.style.display === "block" ? "none" : "block";
+            });
+        });
 
-            // Busca bebidas do tipo selecionado
-            const resp = await fetch('https://visa-pizzaria-backend.onrender.com/api/bebidas');
-            const bebidas = await resp.json();
-            // Filtra pelo tipo
-            const filtradas = bebidas.filter(b => b.tipo && b.tipo.toLowerCase() === tipo.toLowerCase());
-            if (filtradas.length === 0) {
-                document.getElementById('listaBebidas').innerHTML = '<li>Nenhuma bebida cadastrada.</li>';
-            } else {
-                document.getElementById('listaBebidas').innerHTML = filtradas.map(b =>
-                    `<li>${b.nome} - R$ ${b.preco}${b.imagem ? `<br><img src="https://visa-pizzaria-backend.onrender.com${b.imagem}" alt="${b.nome}" style="max-width:80px;">` : ''}</li>`
-                ).join('');
-            }
-            document.getElementById('modalBebidas').classList.add('active');
+        // Abrir modal ao clicar em um item
+        function abrirModalGlobal(nome, preco, imagem) {
+            document.getElementById('modalNome').textContent = nome;
+            document.getElementById('modalPreco').textContent = preco;
+            document.getElementById('modalQtd').value = 1;
+            document.getElementById('modalSubtotal').textContent = preco;
+
+            // Define a imagem corretamente
+            const imgElemento = document.getElementById('modalImg');
+            imgElemento.src = imagem || 'https://via.placeholder.com/120';
+            imgElemento.alt = nome;
+
+            document.getElementById('modalGlobal').classList.add('active');
+        }
+
+        // Fechar modal
+        function fecharModalGlobal() {
+            document.getElementById('modalGlobal').classList.remove('active');
+        }
+        document.getElementById('fecharModalGlobal').onclick = fecharModalGlobal;
+        document.getElementById('modalGlobal').onclick = function(e) {
+            if (e.target === this) fecharModalGlobal();
         };
-    });
 
-    // Fecha o modal
-    document.getElementById('fecharModal').onclick = function() {
-        document.getElementById('modalBebidas').classList.remove('active');
-    };
-    document.getElementById('modalBebidas').onclick = function(e) {
-        if (e.target === this) this.classList.remove('active');
-    };
+        // Adiciona evento de clique nos itens da lista
+        document.querySelectorAll(".item").forEach(item => {
+            item.addEventListener("click", function() {
+                abrirModalGlobal(this.dataset.nome, this.dataset.preco, this.dataset.imagem);
+            });
+        });
     </script>
 </body>
 </html>

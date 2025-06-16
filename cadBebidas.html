@@ -1,112 +1,125 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cadastro de Bebidas</title>
-    <style>
-        /* Sugestão de CSS para cadBebidas.html */
-        /* Pode ser colocado em <style> no <head> ou em um arquivo .css externo */
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cadastro de Bebidas</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
 
-        body {
-            background: #f7fafc;
-            font-family: 'Poppins', Arial, sans-serif;
-            min-height: 100vh;
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
+    body {
+      background-color: #f2f2f2;
+      padding: 20px;
+    }
 
-        h1 {
-            margin-top: 40px;
-            color: #25d366;
-            font-size: 2rem;
-            letter-spacing: 1px;
-        }
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
 
-        form {
-            background: #fff;
-            margin-top: 32px;
-            padding: 32px 24px 24px 24px;
-            border-radius: 12px;
-            box-shadow: 0 2px 16px rgba(0,0,0,0.08);
-            display: flex;
-            flex-direction: column;
-            gap: 18px;
-            min-width: 320px;
-            max-width: 350px;
-            width: 100%;
-        }
+    form {
+      background-color: #fff;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 0 8px rgba(0,0,0,0.1);
+      max-width: 480px;
+      margin: auto;
+    }
 
-        input[type="text"],
-        input[type="file"] {
-            padding: 10px;
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
-            font-size: 1rem;
-            background: #f9fafb;
-            transition: border 0.2s;
-        }
+    label {
+      display: block;
+      margin-top: 15px;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
 
-        input[type="text"]:focus {
-            border: 1.5px solid #25d366;
-            outline: none;
-        }
+    input[type="text"],
+    textarea,
+    input[type="file"] {
+      width: 100%;
+      padding: 10px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
 
-        button[type="submit"] {
-            background: #25d366;
-            color: #fff;
-            border: none;
-            border-radius: 6px;
-            padding: 12px 0;
-            font-size: 1.1rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
+    button {
+      margin-top: 20px;
+      width: 100%;
+      background-color: #007bff;
+      color: white;
+      padding: 12px;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+    }
 
-        button[type="submit"]:hover {
-            background: #1da851;
-        }
+    button:hover {
+      background-color: #0056b3;
+    }
 
-        #msg {
-            margin-top: 18px;
-            font-size: 1rem;
-            color: #e53935;
-            min-height: 24px;
-            text-align: center;
-        }
-    </style>
+    figure {
+      margin-top: 15px;
+      text-align: center;
+    }
+
+    figure img {
+      margin-top: 10px;
+      max-width: 100%;
+      border-radius: 8px;
+    }
+  </style>
 </head>
 <body>
-    <!-- cadBebidas.html -->
-<form id="formBebida" enctype="multipart/form-data">
-    <input type="text" name="nome" placeholder="Nome da bebida" required>
-    <input type="text" name="tipo" placeholder="Tipo (ex: Suco, Refrigerante)" required>
-    <input type="text" name="preco" placeholder="Preço" required>
-    <div id="imagemContainer" class="bebidaGroup">
-            <figure>
-                <figcaption>Bebida Nome</figcaption>
-                <input type="file" id="imagem" name="imagem" accept="image/*" required>
-                <img src="" alt="" srcset="">
-            </figure>
-    </div>
-    <button type="submit">Cadastrar Bebida</button>
-</form>
-<div id="msg"></div>
 
-<script>
-document.getElementById('formBebida').onsubmit = async function(e) {
-    e.preventDefault();
-    const formData = new FormData(this);
-    const response = await fetch('https://visa-pizzaria-backend.onrender.com/api/bebidas', {
-        method: 'POST',
-        body: formData
+  <h1>Cadastro de Bebidas</h1>
+
+  <form id="bebidaForm" enctype="multipart/form-data">
+    <div class="bebidaGroup">
+      <label for="nome">Nome da Bebida:</label>
+      <input type="text" id="nome" name="nome" required>
+
+      <label for="ingredientes">Ingredientes:</label>
+      <textarea id="ingredientes" name="ingredientes" required rows="2"></textarea>
+
+      <label for="imagem">Imagem da Bebida:</label>
+      <input type="file" id="imagem" name="imagem" accept="image/*" required>
+
+      <figure>
+        <figcaption>Pré-visualização:</figcaption>
+        <img id="preview" src="" alt="Imagem da bebida selecionada">
+      </figure>
+    </div>
+
+    <button type="submit">Cadastrar Bebida</button>
+  </form>
+
+  <script>
+    const imagemInput = document.getElementById('imagem');
+    const preview = document.getElementById('preview');
+
+    imagemInput.addEventListener('change', function () {
+      const file = imagemInput.files[0];
+      if (file) {
+        preview.src = URL.createObjectURL(file);
+        preview.style.display = 'block';
+      } else {
+        preview.src = '';
+        preview.style.display = 'none';
+      }
     });
-    const data = await response.json();
-    document.getElementById('msg').textContent = data.message || data.error;
-};
-</script>
+
+    const form = document.getElementById('bebidaForm');
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      alert("🍹 Bebida cadastrada com sucesso!");
+    });
+  </script>
+
 </body>
 </html>
