@@ -142,7 +142,7 @@
             <img id="modalImg" src="" alt="">
             <!-- style colocado por minha conta aqui-->
             <h2 id="modalNome" style="background-color: gold; color: green;">...</h2>
-            <div class="precos-modal" id="modalPrecos"></div>
+            <div class="precos-modal" id="modalPrecos">...</div>
             <div><strong>Ingredientes:</strong><ul id="modalIngredientes"></ul></div>
         </div>
     </div>
@@ -158,26 +158,26 @@
         </div>
     </div>
     <!-- Adicione este botão flutuante ao final do <body> do seu arquivo de pizzas.html -->
-<button id="btnVoltarCardapio"
-    style="
-        position: fixed;
-        bottom: 24px;
-        right: 24px;
-        z-index: 2000;
-        background: #25d366;
-        color: #fff;
-        border: none;
-        border-radius: 50px;
-        padding: 16px 28px;
-        font-size: 1.2rem;
-        font-weight: bold;
-        box-shadow: 0 2px 12px rgba(0,0,0,0.12);
-        cursor: pointer;
-        transition: background 0.2s;
-    "
-    onclick="window.location.href='index.html'"
-    aria-label="Voltar para o cardápio"
->
+    <button id="btnVoltarCardapio"
+        style="
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 2000;
+            background: #25d366;
+            color: #fff;
+            border: none;
+            border-radius: 50px;
+            padding: 16px 28px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.12);
+            cursor: pointer;
+            transition: background 0.2s;
+        "
+        onclick="window.location.href='index.html'"
+        aria-label="Voltar para o cardápio"
+    >
     ⬅️ Voltar
 </button>
 
@@ -315,7 +315,10 @@
         lista.innerHTML='';
         pizzas.forEach((p,idx)=>{
             lista.innerHTML+=`<article class="pizza-card" itemscope itemtype="https://schema.org/Product">
-                ${p.imagem?`<img src="https://visa-pizzaria-backend.onrender.com${p.imagem}" alt="Pizza ${p.nome}" itemprop="image" data-idx="${idx}" onerror="setTimeout(()=>{this.src='https://visa-pizzaria-backend.onrender.com${p.imagem}';},4000)">`:`<div style="width:240px;height:180px;background:#eee;display:flex;align-items:center;justify-content:center;">Sem imagem</div>`}
+                ${p.imagem?`<img src="https://visa-pizzaria-backend.onrender.com${p.imagem}" 
+                alt="Pizza ${p.nome}" itemprop="image" data-idx="${idx}" 
+                onerror="setTimeout(()=>{this.src='https://visa-pizzaria-backend.onrender.com${p.imagem}';},4000)">`:`
+                <div style="width:240px;height:180px;background:#eee;display:flex;align-items:center;justify-content:center;">Sem imagem</div>`}
                 <h2 itemprop="name">${p.nome}</h2>
             </article>`;
         });

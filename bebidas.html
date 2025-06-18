@@ -1,131 +1,331 @@
-<!DOCTYPE html>
+<!-- a partir daqui -->
+ <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bebidas | ViSa Pizzaria</title>
-    <link rel="stylesheet" href="main.css">
-    <style>
-        /* Oculta os subitens inicialmente */
-        .subitens { 
-            display: none; 
-            padding-left: 20px;
-        }
-        
-        /* Estilização básica do modal */
-        .modal-bg {
-            display: none;
-            position: fixed; inset: 0;
-            background: rgba(0,0,0,0.5);
-            justify-content: center; align-items: center;
-            z-index: 1000;
-        }
-        .modal-bg.active { display: flex; }
-        
-        .modal {
-            background: #fff;
-            border-radius: 10px;
-            padding: 24px 18px;
-            max-width: 350px;
-            width: 95vw;
-            box-shadow: 0 4px 24px rgba(0,0,0,.18);
-            position: relative;
-            text-align: center;
-        }
-        
-        .fechar-modal {
-            position: absolute; top: 10px; right: 10px;
-            background: none; border: none; font-size: 1.5rem; cursor: pointer;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bebidas | ViSa Pizzaria</title>
+  <style>
+    body {
+      background: #f7fafc;
+      font-family: 'Poppins', Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    h1 {
+      text-align: center;
+      margin: 32px 0 24px 0;
+      color: #25d366;
+      font-size: 2rem;
+      letter-spacing: 1px;
+    }
+    .grid-bebidas {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr); /* 3 colunas por linha */
+      gap: 24px;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 16px 32px 16px;
+    }
+    .bebida-card {
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 18px 10px 16px 10px;
+      cursor: pointer;
+      transition: box-shadow 0.2s;
+      min-width: 0;
+    }
+    .bebida-card:hover {
+      box-shadow: 0 4px 24px rgba(0,0,0,0.13);
+      background: #f1fff6;
+    }
+    .bebida-card img {
+      width: 100%;
+      max-width: 120px;
+      height: 120px;
+      object-fit: cover;
+      border-radius: 8px;
+      background: #eee;
+      margin-bottom: 10px;
+      transition: transform 0.2s;
+    }
+    .bebida-card:hover img {
+      transform: scale(1.06);
+    }
+    .bebida-nome {
+      font-weight: bold;
+      font-size: 1.1rem;
+      color: #222;
+      text-align: center;
+      margin-bottom: 4px;
+      word-break: break-word;
+    }
+    @media (max-width: 900px) {
+      .grid-bebidas { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 600px) {
+      .grid-bebidas { grid-template-columns: 1fr; }
+    }
 
-        /* Ajuste da imagem no modal */
-        #modalImg {
-            max-width: 120px;
-            max-height: 120px;
-            margin: 10px auto;
-            display: block;
-            border-radius: 8px;
-            background: #eee;
-        }
-    </style>
+    /* Modal */
+    .modal-bg {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    .modal-bg.active { display: flex; }
+    .modal {
+      background: #fff;
+      border-radius: 12px;
+      padding: 28px 18px 22px 18px;
+      max-width: 340px;
+      width: 95vw;
+      box-shadow: 0 4px 24px rgba(0,0,0,.18);
+      position: relative;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .modal img {
+      width: 120px;
+      height: 120px;
+      object-fit: cover;
+      border-radius: 8px;
+      background: #eee;
+      margin-bottom: 12px;
+    }
+    .modal .fechar-modal {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: #e53935;
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      font-size: 1.3rem;
+      width: 32px;
+      height: 32px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-nome {
+      font-size: 1.2rem;
+      font-weight: bold;
+      margin-bottom: 8px;
+      color: #25d366;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px; /* Espaço entre nome e preço */
+    }
+    .modal-preco {
+      color: #222;
+      font-size: 1rem;
+      font-weight: normal;
+      margin-left: 8px;
+      background: #f7fafc;
+      padding: 2px 8px;
+      border-radius: 6px;
+    }
+    .modal-qtd {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 16px 0 10px 0;
+      gap: 8px;
+    }
+    .modal-qtd button {
+      background: #eee;
+      color: #333;
+      border: none;
+      border-radius: 4px;
+      padding: 4px 12px;
+      font-size: 1.2rem;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.2s;
+    }
+    .modal-qtd button:hover {
+      background: #25d366;
+      color: #fff;
+    }
+    .modal-qtd input[type="number"] {
+      width: 44px;
+      text-align: center;
+      font-size: 1.1rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      padding: 4px 0;
+      margin: 0 2px;
+    }
+    .modal-adicionar {
+      background: #25d366;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 10px 24px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: background 0.2s;
+    }
+    .modal-adicionar:hover {
+      background: #1da851;
+    }
+    .modal-subtotal {
+      margin-top: 8px;
+      color: #25d366;
+      font-weight: bold;
+      font-size: 1.05rem;
+    }
+  </style>
 </head>
 <body>
-    <h1>Bebidas</h1>
-    <ul id="bebidaCategorias">
-        <li data-tipo="Refrigerante">🥤 Refrigerantes
-            <ul class="subitens">
-                <li class="item" data-nome="Coca-Cola" data-preco="5,00" data-imagem="https://visa-pizzaria-backend.onrender.com/uploads/coca.jpg">Coca-Cola - R$5,00</li>
-                <li class="item" data-nome="Fanta" data-preco="4,50" data-imagem="https://visa-pizzaria-backend.onrender.com/uploads/fanta.jpg">Fanta - R$4,50</li>
-            </ul>
-        </li>
-        <li data-tipo="Cerveja">🍺 Cervejas
-            <ul class="subitens">
-                <li class="item" data-nome="Original" data-preco="7,00" data-imagem="https://visa-pizzaria-backend.onrender.com/uploads/original.jpg">Original - R$7,00</li>
-                <li class="item" data-nome="Skol" data-preco="6,50" data-imagem="https://visa-pizzaria-backend.onrender.com/uploads/skol.jpg">Skol - R$6,50</li>
-            </ul>
-        </li>
-    </ul>
+  <h1>Bebidas</h1>
+  <!-- Grid de bebidas, 3 por linha -->
+  <section class="grid-bebidas" id="gridBebidas"></section>
 
-    <!-- Modal de detalhes -->
-    <div class="modal-bg" id="modalGlobal">
-        <div class="modal">
-            <button class="fechar-modal" id="fecharModalGlobal" aria-label="Fechar">✖️</button>
-            <h2 id="modalNome"></h2>
-            <img id="modalImg" src="" alt="">
-            <div>
-                <strong>Preço unitário:</strong> R$ <span id="modalPreco"></span>
-            </div>
-            <div style="margin:14px 0;">
-                <button id="btnMenos">-</button>
-                <input type="number" id="modalQtd" value="1" min="1">
-                <button id="btnMais">+</button>
-            </div>
-            <div>
-                <strong>Subtotal:</strong> R$ <span id="modalSubtotal"></span>
-            </div>
-            <button id="btnAdicionarCarrinho">Adicionar ao Carrinho</button>
-        </div>
+  <!-- Modal de detalhes da bebida -->
+  <div class="modal-bg" id="modalBg">
+    <div class="modal">
+      <button class="fechar-modal" id="fecharModal" aria-label="Fechar">✖️</button>
+      <img id="modalImg" src="" alt="">
+      <!-- Nome e preço unitário lado a lado -->
+      <div class="modal-nome" id="modalNome">
+        <span id="modalNomeTexto"></span>
+        <span class="modal-preco" id="modalPreco"></span>
+      </div>
+      <div class="modal-qtd">
+        <button id="btnMenos">-</button>
+        <input type="number" id="modalQtd" value="1" min="1">
+        <button id="btnMais">+</button>
+      </div>
+      <div class="modal-subtotal" id="modalSubtotal"></div>
+      <button class="modal-adicionar" id="btnAdicionar">Adicionar</button>
     </div>
+  </div>
 
-    <script>
-        // Exibir/ocultar subitens ao clicar na categoria
-        document.querySelectorAll("#bebidaCategorias > li").forEach(categoria => {
-            categoria.addEventListener("click", function() {
-                const sublista = this.querySelector(".subitens");
-                if (sublista) sublista.style.display = sublista.style.display === "block" ? "none" : "block";
-            });
+  <!-- Botão flutuante para voltar ao cardápio -->
+  <button id="btnVoltarCardapio"
+      style="
+          position: fixed;
+          bottom: 24px;
+          right: 24px;
+          z-index: 2000;
+          background: #25d366;
+          color: #fff;
+          border: none;
+          border-radius: 50px;
+          padding: 16px 28px;
+          font-size: 1.2rem;
+          font-weight: bold;
+          box-shadow: 0 2px 12px rgba(0,0,0,0.12);
+          cursor: pointer;
+          transition: background 0.2s;
+      "
+      onclick="window.location.href='index.html'"
+      aria-label="Voltar para o cardápio"
+  >
+    ⬅️ Voltar
+  </button>
+
+  <script>
+    // Carrinho simples para armazenar bebidas adicionadas
+    let carrinho = [];
+
+    // Função para abrir o modal com detalhes da bebida
+    function abrirModal(bebida) {
+      // Define imagem e nome no modal
+      document.getElementById('modalImg').src = 'https://visa-pizzaria-backend.onrender.com' + bebida.imagem;
+      document.getElementById('modalImg').alt = bebida.nome;
+      document.getElementById('modalNomeTexto').textContent = bebida.nome; // Nome
+      document.getElementById('modalPreco').textContent = 'R$ ' + bebida.preco; // Preço unitário
+      document.getElementById('modalQtd').value = 1;
+
+      // Função para atualizar subtotal
+      function atualizarSubtotal() {
+        const qtd = parseInt(document.getElementById('modalQtd').value) || 1;
+        const preco = parseFloat(bebida.preco.replace(',', '.')) || 0;
+        document.getElementById('modalSubtotal').textContent = 'Subtotal: R$ ' + (qtd * preco).toFixed(2).replace('.', ',');
+      }
+      atualizarSubtotal();
+
+      // Botão de aumentar quantidade
+      document.getElementById('btnMais').onclick = () => {
+        document.getElementById('modalQtd').value = parseInt(document.getElementById('modalQtd').value) + 1;
+        atualizarSubtotal();
+      };
+      // Botão de diminuir quantidade
+      document.getElementById('btnMenos').onclick = () => {
+        let val = parseInt(document.getElementById('modalQtd').value);
+        if (val > 1) document.getElementById('modalQtd').value = val - 1;
+        atualizarSubtotal();
+      };
+      // Atualiza subtotal ao digitar manualmente
+      document.getElementById('modalQtd').oninput = atualizarSubtotal;
+
+      // Botão para adicionar ao carrinho
+      document.getElementById('btnAdicionar').onclick = () => {
+        const qtd = parseInt(document.getElementById('modalQtd').value) || 1;
+        carrinho.push({
+          nome: bebida.nome,
+          imagem: bebida.imagem,
+          quantidade: qtd,
+          preco: bebida.preco
         });
+        alert('Adicionado ao carrinho!');
+        fecharModal();
+      };
 
-        // Abrir modal ao clicar em um item
-        function abrirModalGlobal(nome, preco, imagem) {
-            document.getElementById('modalNome').textContent = nome;
-            document.getElementById('modalPreco').textContent = preco;
-            document.getElementById('modalQtd').value = 1;
-            document.getElementById('modalSubtotal').textContent = preco;
+      // Exibe o modal
+      document.getElementById('modalBg').classList.add('active');
+    }
 
-            // Define a imagem corretamente
-            const imgElemento = document.getElementById('modalImg');
-            imgElemento.src = imagem || 'https://via.placeholder.com/120';
-            imgElemento.alt = nome;
+    // Função para fechar o modal
+    function fecharModal() {
+      document.getElementById('modalBg').classList.remove('active');
+    }
 
-            document.getElementById('modalGlobal').classList.add('active');
-        }
+    // Evento para fechar o modal ao clicar no botão X
+    document.getElementById('fecharModal').onclick = fecharModal;
+    // Fecha o modal ao clicar fora da área do modal
+    document.getElementById('modalBg').onclick = function(e) {
+      if (e.target === this) fecharModal();
+    };
 
-        // Fechar modal
-        function fecharModalGlobal() {
-            document.getElementById('modalGlobal').classList.remove('active');
-        }
-        document.getElementById('fecharModalGlobal').onclick = fecharModalGlobal;
-        document.getElementById('modalGlobal').onclick = function(e) {
-            if (e.target === this) fecharModalGlobal();
-        };
+    // Função para carregar bebidas da API e montar o grid
+    async function carregarBebidas() {
+      // Busca as bebidas cadastradas no backend
+      const resp = await fetch('https://visa-pizzaria-backend.onrender.com/api/bebidas');
+      const bebidas = await resp.json();
+      const grid = document.getElementById('gridBebidas');
+      grid.innerHTML = '';
+      // Para cada bebida, cria um card clicável
+      bebidas.forEach(bebida => {
+        const card = document.createElement('div');
+        card.className = 'bebida-card';
+        card.innerHTML = `
+          <img src="https://visa-pizzaria-backend.onrender.com${bebida.imagem}" alt="${bebida.nome}">
+          <div class="bebida-nome">${bebida.nome}</div>
+        `;
+        card.onclick = () => abrirModal(bebida); // Ao clicar, abre o modal
+        grid.appendChild(card);
+      });
+    }
 
-        // Adiciona evento de clique nos itens da lista
-        document.querySelectorAll(".item").forEach(item => {
-            item.addEventListener("click", function() {
-                abrirModalGlobal(this.dataset.nome, this.dataset.preco, this.dataset.imagem);
-            });
-        });
-    </script>
+    // Carrega as bebidas ao abrir a página
+    document.addEventListener('DOMContentLoaded', carregarBebidas);
+  </script>
 </body>
-</html>
