@@ -1,5 +1,4 @@
-<!-- a partir daqui -->
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
@@ -21,11 +20,12 @@
     }
     .grid-bebidas {
       display: grid;
-      grid-template-columns: repeat(3, 1fr); /* 3 colunas por linha */
+      grid-template-columns: repeat(3, 1fr);
       gap: 24px;
       max-width: 900px;
       margin: 0 auto;
       padding: 0 16px 32px 16px;
+      position: relative;
     }
     .bebida-card {
       background: #fff;
@@ -70,7 +70,33 @@
     @media (max-width: 600px) {
       .grid-bebidas { grid-template-columns: 1fr; }
     }
-
+    /* Botão carrinho flutuante acima da segunda bebida */
+    .carrinho-flutuante-btn {
+      position: absolute;
+      top: 10px;
+      left: 52%;
+      transform: translateX(-50%);
+      z-index: 2100;
+      background: #ff9800;
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 44px;
+      height: 44px;
+      font-size: 1.5rem;
+      font-weight: bold;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.13);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 3px solid #fff;
+      transition: background 0.2s;
+    }
+    .carrinho-flutuante-btn:hover {
+      background: #25d366;
+      color: #fff;
+    }
     /* Modal */
     .modal-bg {
       display: none;
@@ -127,7 +153,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 12px; /* Espaço entre nome e preço */
+      gap: 12px;
     }
     .modal-preco {
       color: #222;
@@ -190,11 +216,30 @@
       font-weight: bold;
       font-size: 1.05rem;
     }
+    /* Carrinho flutuante */
+    #carrinhoFlutuante {
+      position: fixed;
+      top: 80px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 3000;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.13);
+      padding: 18px 20px 14px 20px;
+      min-width: 260px;
+      max-width: 95vw;
+      display: none;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    @media (max-width:700px){
+      .carrinho-flutuante-btn { left: 50%; }
+    }
   </style>
 </head>
 <body>
   <h1>Bebidas</h1>
-  <!-- Grid de bebidas, 3 por linha -->
   <section class="grid-bebidas" id="gridBebidas"></section>
 
   <!-- Modal de detalhes da bebida -->
@@ -202,7 +247,6 @@
     <div class="modal">
       <button class="fechar-modal" id="fecharModal" aria-label="Fechar">✖️</button>
       <img id="modalImg" src="" alt="">
-      <!-- Nome e preço unitário lado a lado -->
       <div class="modal-nome" id="modalNome">
         <span id="modalNomeTexto"></span>
         <span class="modal-preco" id="modalPreco"></span>
@@ -241,20 +285,136 @@
     ⬅️ Voltar
   </button>
 
+  <!-- Carrinho flutuante global -->
+  <div id="carrinhoFlutuante">
+    <div style="display:flex;align-items:center;justify-content:space-between;width:100%;">
+      <strong style="font-size:1.15rem;color:#25d366;">🛒 Carrinho</strong>
+      <button id="fecharCarrinho" style="background:none;border:none;font-size:1.3rem;cursor:pointer;color:#e53935;">✖️</button>
+    </div>
+    <ul id="listaCarrinho" style="list-style:none;padding:0;margin:12px 0 0 0;width:100%;"></ul>
+    <div id="carrinhoTotal" style="margin:10px 0 0 0;font-weight:bold;color:#222;"></div>
+    <button id="btnFinalizar" style="margin-top:14px;background:#25d366;color:#fff;border:none;border-radius:6px;padding:10px 0;width:100%;font-size:1.1rem;cursor:pointer;">Finalizar Pedido</button>
+  </div>
+
   <script>
-    // Carrinho simples para armazenar bebidas adicionadas
-    let carrinho = [];
+    // Carrinho global: persiste entre páginas via localStorage
+    let carrinho = JSON.parse(localStorage.getItem('visaCarrinho')) || [];
+
+    function salvarCarrinho() {
+      localStorage.setItem('visaCarrinho', JSON.stringify(carrinho));
+    }
+
+    function adicionarAoCarrinho(item) {
+      const idx = carrinho.findIndex(i => i.tipo === item.tipo && i.nome === item.nome && i.preco === item.preco);
+      if (idx >= 0) {
+        carrinho[idx].quantidade += item.quantidade;
+      } else {
+        carrinho.push(item);
+      }
+      salvarCarrinho();
+      atualizarCarrinhoUI();
+    }
+
+    function removerDoCarrinho(idx) {
+      carrinho.splice(idx, 1);
+      salvarCarrinho();
+      atualizarCarrinhoUI();
+    }
+
+    function atualizarCarrinhoUI() {
+      const carrinhoDiv = document.getElementById('carrinhoFlutuante');
+      const lista = document.getElementById('listaCarrinho');
+      const totalDiv = document.getElementById('carrinhoTotal');
+      if (!carrinhoDiv || !lista || !totalDiv) return;
+
+      if (carrinho.length === 0) {
+        lista.innerHTML = '<li style="color:#888;">Seu carrinho está vazio.</li>';
+        totalDiv.textContent = '';
+        carrinhoDiv.style.display = 'none';
+        return;
+      }
+
+      lista.innerHTML = '';
+      let total = 0;
+      carrinho.forEach((item, idx) => {
+        const precoNum = parseFloat((item.preco || '0').toString().replace(',', '.'));
+        total += precoNum * item.quantidade;
+        lista.innerHTML += `
+          <li style="margin-bottom:8px;display:flex;align-items:center;gap:8px;">
+            ${item.imagem ? `<img src="https://visa-pizzaria-backend.onrender.com${item.imagem}" alt="" style="width:32px;height:32px;object-fit:cover;border-radius:4px;">` : ''}
+            <div style="flex:1;">
+              <span style="font-size:0.97em;color:#25d366;">${item.tipo || 'Bebida'}</span><br>
+              <strong>${item.nome}</strong> x${item.quantidade}<br>
+              <span style="font-size:0.97em;">R$ ${(precoNum * item.quantidade).toFixed(2).replace('.', ',')}</span>
+            </div>
+            <button onclick="removerDoCarrinho(${idx})" style="background:none;border:none;color:#e53935;font-size:1.2em;cursor:pointer;">🗑️</button>
+          </li>
+        `;
+      });
+      totalDiv.textContent = 'Total: R$ ' + total.toFixed(2).replace('.', ',');
+      //carrinhoDiv.style.display = 'flex'; // alterado para mostrar o carrinho apenas quando clicado
+    }
+
+    // ALTERAÇÃO: Sempre deixa o carrino oculto inicialmente
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('carrinhoFlutuante').style.display = 'none';
+    });
+
+
+    document.getElementById('fecharCarrinho').onclick = () => {
+        document.getElementById('carrinhoFlutuante').style.display = 'none';
+        atualizarCarrinhoUI();
+        
+    };
+
+    document.getElementById('btnFinalizar').onclick = () => {
+      if (carrinho.length === 0) return;
+      let msg = "Olá! Quero pedir:\n";
+      carrinho.forEach(item => {
+        msg += `- ${item.tipo || 'Bebida'}: ${item.nome} x${item.quantidade} (R$ ${item.preco})\n`;
+      });
+      let total = carrinho.reduce((acc, i) => acc + (parseFloat((i.preco || '0').toString().replace(',', '.')) * i.quantidade), 0);
+      msg += `Total: R$ ${total.toFixed(2).replace('.', ',')}`;
+      window.open(`https://wa.me/5511995424085?text=${encodeURIComponent(msg)}`, '_blank');
+    };
+    if (carrinho.length > 0) atualizarCarrinhoUI();
+    window.adicionarAoCarrinho = adicionarAoCarrinho;
+    window.removerDoCarrinho = removerDoCarrinho;
+
+    // Função para inserir o botão do carrinho acima da segunda bebida
+    function inserirBotaoCarrinho() {
+      const grid = document.getElementById('gridBebidas');
+      const oldBtn = document.getElementById('carrinhoFlutuanteBtn');
+      if (oldBtn) oldBtn.remove();
+
+      const btn = document.createElement('button');
+      btn.id = 'carrinhoFlutuanteBtn';
+      btn.className = 'carrinho-flutuante-btn';
+      btn.title = 'Ver carrinho';
+      btn.innerHTML = '🛒';
+      btn.onclick = () => {
+        atualizarCarrinhoUI();
+        document.getElementById('carrinhoFlutuante').style.display = 'flex';
+      };
+
+      const cards = grid.querySelectorAll('.bebida-card');
+      if (cards.length >= 2) {
+        grid.insertBefore(btn, cards[1]);
+      } else if (cards.length === 1) {
+        grid.insertBefore(btn, cards[0]);
+      } else {
+        grid.appendChild(btn);
+      }
+    }
 
     // Função para abrir o modal com detalhes da bebida
     function abrirModal(bebida) {
-      // Define imagem e nome no modal
       document.getElementById('modalImg').src = 'https://visa-pizzaria-backend.onrender.com' + bebida.imagem;
       document.getElementById('modalImg').alt = bebida.nome;
-      document.getElementById('modalNomeTexto').textContent = bebida.nome; // Nome
-      document.getElementById('modalPreco').textContent = 'R$ ' + bebida.preco; // Preço unitário
+      document.getElementById('modalNomeTexto').textContent = bebida.nome;
+      document.getElementById('modalPreco').textContent = 'R$ ' + bebida.preco;
       document.getElementById('modalQtd').value = 1;
 
-      // Função para atualizar subtotal
       function atualizarSubtotal() {
         const qtd = parseInt(document.getElementById('modalQtd').value) || 1;
         const preco = parseFloat(bebida.preco.replace(',', '.')) || 0;
@@ -262,57 +422,46 @@
       }
       atualizarSubtotal();
 
-      // Botão de aumentar quantidade
       document.getElementById('btnMais').onclick = () => {
         document.getElementById('modalQtd').value = parseInt(document.getElementById('modalQtd').value) + 1;
         atualizarSubtotal();
       };
-      // Botão de diminuir quantidade
       document.getElementById('btnMenos').onclick = () => {
         let val = parseInt(document.getElementById('modalQtd').value);
         if (val > 1) document.getElementById('modalQtd').value = val - 1;
         atualizarSubtotal();
       };
-      // Atualiza subtotal ao digitar manualmente
       document.getElementById('modalQtd').oninput = atualizarSubtotal;
 
-      // Botão para adicionar ao carrinho
       document.getElementById('btnAdicionar').onclick = () => {
         const qtd = parseInt(document.getElementById('modalQtd').value) || 1;
-        carrinho.push({
+        adicionarAoCarrinho({
+          tipo: 'Bebida',
           nome: bebida.nome,
           imagem: bebida.imagem,
           quantidade: qtd,
           preco: bebida.preco
         });
-        alert('Adicionado ao carrinho!');
         fecharModal();
       };
 
-      // Exibe o modal
       document.getElementById('modalBg').classList.add('active');
     }
 
-    // Função para fechar o modal
     function fecharModal() {
       document.getElementById('modalBg').classList.remove('active');
     }
 
-    // Evento para fechar o modal ao clicar no botão X
     document.getElementById('fecharModal').onclick = fecharModal;
-    // Fecha o modal ao clicar fora da área do modal
     document.getElementById('modalBg').onclick = function(e) {
       if (e.target === this) fecharModal();
     };
 
-    // Função para carregar bebidas da API e montar o grid
     async function carregarBebidas() {
-      // Busca as bebidas cadastradas no backend
       const resp = await fetch('https://visa-pizzaria-backend.onrender.com/api/bebidas');
       const bebidas = await resp.json();
       const grid = document.getElementById('gridBebidas');
       grid.innerHTML = '';
-      // Para cada bebida, cria um card clicável
       bebidas.forEach(bebida => {
         const card = document.createElement('div');
         card.className = 'bebida-card';
@@ -320,12 +469,13 @@
           <img src="https://visa-pizzaria-backend.onrender.com${bebida.imagem}" alt="${bebida.nome}">
           <div class="bebida-nome">${bebida.nome}</div>
         `;
-        card.onclick = () => abrirModal(bebida); // Ao clicar, abre o modal
+        card.onclick = () => abrirModal(bebida);
         grid.appendChild(card);
       });
+      inserirBotaoCarrinho();
     }
 
-    // Carrega as bebidas ao abrir a página
     document.addEventListener('DOMContentLoaded', carregarBebidas);
   </script>
 </body>
+</html>

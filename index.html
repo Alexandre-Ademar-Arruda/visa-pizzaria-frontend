@@ -3,15 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ViSa Pizzaria</title>
-    
-    <!-- Fonte moderna do Google Fonts -->
+    <title>ViSa Pizzaria | Cardápio Online</title>
+    <meta name="description" content="Cardápio online da ViSa Pizzaria. Pizzas, bebidas, saladas, sobremesas e lanches. Peça pelo WhatsApp!">
+    <meta name="keywords" content="pizzaria, pizza, bebidas, saladas, sobremesas, lanches, delivery, cardápio, ViSa, São Paulo">
+    <meta name="author" content="ViSa Pizzaria">
+    <meta name="robots" content="index, follow">
+    <!-- GEO tags -->
+    <meta name="geo.region" content="BR-SP">
+    <meta name="geo.placename" content="São Paulo">
+    <meta name="geo.position" content="-23.55052;-46.633308">
+    <meta name="ICBM" content="-23.55052, -46.633308">
+    <!-- Open Graph -->
+    <meta property="og:title" content="ViSa Pizzaria | Cardápio Online">
+    <meta property="og:description" content="Veja nosso cardápio online e peça pelo WhatsApp. Pizzas, bebidas, saladas, sobremesas e lanches.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://alexandre-ademar-arruda.github.io/visa-pizzaria-frontend/">
+    <meta property="og:image" content="https://alexandre-ademar-arruda.github.io/visa-pizzaria-frontend/imagens/logo.png">
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="ViSa Pizzaria | Cardápio Online">
+    <meta name="twitter:description" content="Veja nosso cardápio online e peça pelo WhatsApp.">
+    <meta name="twitter:image" content="https://alexandre-ademar-arruda.github.io/visa-pizzaria-frontend/imagens/logo.png">
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
-
-    <!-- Link para CSS atualizado -->
-    <!-- <link rel="stylesheet" href="main.css"> -->
     <style>
-        /* Estilo global */
         body {
             font-family: 'Poppins', sans-serif;
             background-color: #fafafa;
@@ -19,8 +34,6 @@
             margin: 0;
             padding: 0;
         }
-
-        /* Modal estilizado */
         .modal-bg {
             display: flex;
             justify-content: center;
@@ -35,12 +48,10 @@
             visibility: hidden;
             transition: 0.5s ease-in-out;
         }
-
         .modal-bg.active {
             opacity: 1;
             visibility: visible;
         }
-
         .modal {
             background: #fff;
             padding: 20px;
@@ -48,18 +59,16 @@
             max-width: 400px;
             text-align: center;
             box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+            position: relative;
+            min-height: 420px;
         }
-
-        /* Lista do menu */
         .menu-list {
             list-style: none;
             padding: 0;
         }
-
         .menu-list li {
             margin: 10px 0;
         }
-
         .menu-list a {
             text-decoration: none;
             font-size: 20px;
@@ -67,12 +76,10 @@
             color: #25d366;
             transition: 0.3s;
         }
-
-        .menu-list a:hover {
+        .menu-list a:hover, .menu-list a:focus {
             color: #e53935;
+            outline: none;
         }
-
-        /* Botão fechar */
         .fechar-modal {
             background: none;
             border: none;
@@ -80,35 +87,195 @@
             cursor: pointer;
             margin-top: 10px;
         }
+        /* Carrinho fixo no topo do modal */
+        #carrinhoFlutuante {
+            position: fixed;
+            top: 32px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 2001;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.18);
+            padding: 18px 20px 14px 20px;
+            min-width: 260px;
+            max-width: 95vw;
+            display: none;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        @media (max-width: 500px) {
+            .modal {
+                max-width: 98vw;
+                padding: 10px;
+                min-height: 0;
+            }
+            #carrinhoFlutuante {
+                min-width: 0;
+                padding: 10px;
+                left: 50%;
+                transform: translateX(-50%);
+            }
+        }
+        /* Botão carrinho no topo direito do modal */
+        #abrirCarrinhoBtn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #ff9800;
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            z-index: 2100;
+        }
+        #abrirCarrinhoBtn:hover, #abrirCarrinhoBtn:focus {
+            background: #25d366;
+            outline: none;
+        }
+
+        #listaCarrinho {
+            max-height: 180px;
+            overflow-y: auto;
+        }
+        #btnFinalizar {
+            position: sticky;
+            bottom: 0;
+            background: #25d366;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            padding: 10px 0;
+            width: 100%;
+            font-size: 1.1rem;
+            cursor: pointer;
+            margin-top: 10px;
+            z-index: 2;
+        }
     </style>
 </head>
-<body>
+<body itemscope itemtype="https://schema.org/Restaurant">
+    <h1 style="position:absolute;left:-9999px;" itemprop="name">ViSa Pizzaria - Cardápio Online</h1>
 
     <!-- Modal do Menu Inicial -->
-    <div class="modal-bg active" id="modalMenu">
+    <div class="modal-bg active" id="modalMenu" role="dialog" aria-modal="true" aria-labelledby="tituloMenu">
         <div class="modal">
-            <h1>Bem-vindo à ViSa Pizzaria! 🍕</h1>
-            <ul class="menu-list">
-                <li><a href="./pizzas.html">🍕 Pizzas</a></li>
-                <li><a href="./bebidas.html">🥤 Bebidas</a></li>
-                <li><a href="./saladas.html">🥗 Saladas</a></li>
-                <li><a href="./sobremesas.html">🍰 Sobremesas</a></li>
-                <li><a href="./lanches.html">🍔 Lanches</a></li>
-            </ul>
+            <!-- Carrinho flutuante fixo no topo do modal -->
+            <div id="carrinhoFlutuante">
+                <div style="display:flex;align-items:center;justify-content:space-between;width:100%;">
+                    <strong style="font-size:1.15rem;color:#25d366;">🛒 Carrinho</strong>
+                    <button id="fecharCarrinho" style="background:none;border:none;font-size:1.3rem;cursor:pointer;color:#e53935;" aria-label="Fechar carrinho">✖️</button>
+                </div>
+                <ul id="listaCarrinho" style="list-style:none;padding:0;margin:12px 0 0 0;width:100%;max-height:180px;overflow-y:auto;"></ul>
+                <div id="carrinhoTotal" style="margin:10px 0 0 0;font-weight:bold;color:#222;"></div>
+                <div style="width:100%;position:sticky;bottom:0;background:#fff;padding-top:10px;">
+                    <button id="btnFinalizar" style="background:#25d366;color:#fff;border:none;border-radius:6px;padding:10px 0;width:100%;font-size:1.1rem;cursor:pointer;">Finalizar Pedido</button>
+                </div>
+            </div>
+            <!-- Botão para abrir carrinho -->
+            <button id="abrirCarrinhoBtn" aria-label="Ver carrinho">🛒</button>
+            <h2 id="tituloMenu" itemprop="servesCuisine" style="margin-top:60px;">Bem-vindo à ViSa Pizzaria! 🍕</h2>
+            <nav aria-label="Menu principal">
+                <ul class="menu-list">
+                    <li><a href="./pizzas.html" itemprop="hasMenuSection">🍕 Pizzas</a></li>
+                    <li><a href="./bebidas.html" itemprop="hasMenuSection">🥤 Bebidas</a></li>
+                    <li><a href="./saladas.html" itemprop="hasMenuSection">🥗 Saladas</a></li>
+                    <li><a href="./sobremesas.html" itemprop="hasMenuSection">🍰 Sobremesas</a></li>
+                    <li><a href="./lanches.html" itemprop="hasMenuSection">🍔 Lanches</a></li>
+                </ul>
+            </nav>
+            <address style="font-size:0.95em;color:#888;margin-top:18px;" itemprop="address" itemscope itemtype="https://schema.org/PostalAddress">
+                <span itemprop="streetAddress">Rua Exemplo, 123</span> - 
+                <span itemprop="addressLocality">São Paulo</span> - 
+                <span itemprop="addressRegion">SP</span><br>
+                <span itemprop="telephone">Tel: (11) 99542-4085</span>
+            </address>
         </div>
     </div>
 
     <script>
-        // Abre o modal automaticamente
-        document.addEventListener('DOMContentLoaded', () => {
-            const modal = document.getElementById('modalMenu');
-            modal.classList.add('active');
+        // Carrinho global: persiste entre páginas via localStorage
+        let carrinho = JSON.parse(localStorage.getItem('visaCarrinho')) || [];
 
-            document.getElementById('fecharMenu').onclick = () => {
-                modal.classList.remove('active');
-            };
+        function salvarCarrinho() {
+            localStorage.setItem('visaCarrinho', JSON.stringify(carrinho));
+        }
+
+        function removerDoCarrinho(idx) {
+            carrinho.splice(idx, 1);
+            salvarCarrinho();
+            atualizarCarrinhoUI();
+        }
+
+        function atualizarCarrinhoUI() {
+            const carrinhoDiv = document.getElementById('carrinhoFlutuante');
+            const lista = document.getElementById('listaCarrinho');
+            const totalDiv = document.getElementById('carrinhoTotal');
+            if (!carrinhoDiv || !lista || !totalDiv) return;
+
+            if (carrinho.length === 0) {
+                lista.innerHTML = '<li style="color:#888;">Seu carrinho está vazio.</li>';
+                totalDiv.textContent = '';
+                carrinhoDiv.style.display = 'none';
+                return;
+            }
+
+            lista.innerHTML = '';
+            let total = 0;
+            carrinho.forEach((item, idx) => {
+                const precoNum = parseFloat((item.preco || '0').toString().replace(',', '.'));
+                total += precoNum * item.quantidade;
+                lista.innerHTML += `
+                    <li style="margin-bottom:8px;display:flex;align-items:center;gap:8px;">
+                        ${item.imagem ? `<img src="${item.imagem}" alt="" style="width:32px;height:32px;object-fit:cover;border-radius:4px;">` : ''}
+                        <div style="flex:1;">
+                            <span style="font-size:0.97em;color:#25d366;">${item.tipo || ''}${item.tamanho ? ' ('+item.tamanho+')' : ''}</span><br>
+                            <strong>${item.nome}</strong> x${item.quantidade}<br>
+                            <span style="font-size:0.97em;">R$ ${(precoNum * item.quantidade).toFixed(2).replace('.', ',')}</span>
+                        </div>
+                        <button onclick="removerDoCarrinho(${idx})" style="background:none;border:none;color:#e53935;font-size:1.2em;cursor:pointer;" aria-label="Remover item">🗑️</button>
+                    </li>
+                `;
+            });
+            totalDiv.textContent = 'Total: R$ ' + total.toFixed(2).replace('.', ',');
+        }
+
+        // Sempre deixa o carrinho invisível ao carregar a página
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('carrinhoFlutuante').style.display = 'none';
         });
-    </script>
 
+        // Botão do carrinho: mostra o carrinho ao clicar
+        document.getElementById('abrirCarrinhoBtn').onclick = () => {
+            atualizarCarrinhoUI();
+            document.getElementById('carrinhoFlutuante').style.display = 'flex';
+        };
+
+        // Botão fechar carrinho: esconde o carrinho ao clicar no X
+        document.getElementById('fecharCarrinho').onclick = () => {
+            document.getElementById('carrinhoFlutuante').style.display = 'none';
+        };
+
+        document.getElementById('btnFinalizar').onclick = () => {
+            if (carrinho.length === 0) return;
+            let msg = "Olá! Quero pedir:\n";
+            carrinho.forEach(item => {
+                msg += `- ${item.tipo || 'Produto'}${item.tamanho ? ' ('+item.tamanho+')' : ''}: ${item.nome} x${item.quantidade} (R$ ${item.preco})\n`;
+            });
+            let total = carrinho.reduce((acc, i) => acc + (parseFloat((i.preco || '0').toString().replace(',', '.')) * i.quantidade), 0);
+            msg += `Total: R$ ${total.toFixed(2).replace('.', ',')}`;
+            window.open(`https://wa.me/5511995424085?text=${encodeURIComponent(msg)}`, '_blank');
+            // Limpa o carrinho após finalizar
+            carrinho = [];
+            salvarCarrinho();
+            atualizarCarrinhoUI();
+            document.getElementById('carrinhoFlutuante').style.display = 'none';
+        };
+
+        if (carrinho.length > 0) atualizarCarrinhoUI();
+    </script>
 </body>
 </html>
