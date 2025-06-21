@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saladas | ViSa Pizzaria</title>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        #formContainer {
+            max-width: 500px;/* limita a larguara do form mesmo em telas grandes*/
+            margin: 20px auto; /*centraliza o form na tela*/
+            padding: 16px; /*adiciona espaçamento interno ao form*/
+            background-color: red;/*cor de fundo do form*/
+            border-radius: 8px;/*arredonda os cantos*/
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);/*adiciona sombra ao form*/
+        }
+
+        form label {
+            display: block;
+            margin-top: 12px;
+            font-weight: bold;
+            font-size: 1rem;
+        }
+
+        form input[type="text"],
+        form textarea,
+        form input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            margin-top: 4px;
+            border: 1px solid black;
+            border-radius: 6px;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+
+        form textarea {
+            resize: vertical;
+        }
+
+        form button {
+            margin-top: 16px;
+            padding:12px;
+            background-color:aqua;
+            color:green;
+            border:none;
+            border-radius: 6px;
+            font-size:1rem;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        form button:hover {
+            background-color: lightgreen;
+        }
+
+        figure {
+            margin-top: 16px;
+            text-align:center;
+        }
+        figure img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 8px auto;
+            border-radius: 6px;
+            box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
+        }
+
+        figure figcaption {
+            font-size: 0.9rem;
+            color: #555;
+            margin-top: 4px;
+        }
+
+        form {
+            display: flex;
+            flex-direction:column;
+            gap: 16px;
+            background-color:#ffffff;
+            padding: 20px;
+            border-radius:12px;
+            box-shadow: 0 0 16px rgba(0, 0, 0, 0.3);
+            max-width: 300px;
+            margin:0 auto;
+        }
+
+        @media (max-width:600px) {
+            form {
+                padding: 16px;
+                border-radius:0;
+                box-shadow: none;
+                max-width: 300px;
+            }
+
+            input[type="text"],
+            texarea,
+            input[type="file"] {
+                font-size: 1rem;
+                padding: 12px;
+            }
+            form button {
+                padding: 14px;
+                font-size: 1.1rem;
+            }
+            img {
+                max-width: 100%;
+                height: auto;
+                border-radius: 8px;
+                margin-top: 10px
+            }
+
+        }
+
+    </style>
+</head>
+<body>
+    <div id="formContainer">
+
+    </div>
+    <script>
+        //Passo 1 – Criar um contêiner no HTML onde o formulário será inserido
+        //pega o container onde vamos inserir o formulario
+        const formContainer = document.getElementById('formContainer');
+        
+        //🥈 Passo 2 – Criar o elemento <form> usando JavaScript
+        //cria o formulario
+        const form = document.createElement('form');
+        
+        //define atributos do formulario
+        form.setAttribute('id', "/cadastroSalada");
+        form.setAttribute('method', "POST");
+        form.setAttribute('enctype', "multipart/form-data");
+        
+        //adiciona o formulario ao container
+        formContainer.appendChild(form);
+
+
+        //🥉 Passo 3 – Adicionar o campo de texto “Nome da Salada” ao formulário
+        //cria o rotulo
+        const labelNome = document.createElement('Label');
+        labelNome.setAttribute('for', "nome");
+        labelNome.textContent = "Nome da Salada: ";
+        
+        //cria o input (campo de entrada)
+        const inputNome = document.createElement('input');
+        inputNome.setAttribute('type', "text");
+        inputNome.setAttribute('id', "nome");
+        inputNome.setAttribute('name', "nome");
+        inputNome.setAttribute('required', true);
+        
+        //adiciona o label e o input ao formulario
+        form.appendChild(labelNome);
+        form.appendChild(inputNome);
+
+        //🥒 Passo 4 – Adicionar o campo de descrição da salada
+        //cria o label com o texto "ingredientes"
+        const labelIngredientes = document.createElement('Label');
+        labelIngredientes.setAttribute('for', "ingredientes");
+        labelIngredientes.textContent = "Ingredientes: ";
+
+        //cria o textArea para a descrição
+        const textAreaIngredientes = document.createElement('textarea');
+        textAreaIngredientes.setAttribute('id', "ingredientes");
+        textAreaIngredientes.setAttribute('name', "ingredientes");
+        textAreaIngredientes.setAttribute('rows', "3");
+        textAreaIngredientes.setAttribute('required', true);
+
+        //adiciona o label e o texArea ao formulario
+        form.appendChild(labelIngredientes);
+        form.appendChild(textAreaIngredientes);
+
+        
+        //🧀 Passo 5 – Adicionar o campo de preço da salada
+        //cria o label para o preço
+        const labelPreco = document.createElement('Label');
+        labelPreco.setAttribute('for', "preco");
+        labelPreco.textContent = "Preço: ";
+
+        //cria o input para o preço
+        const inputPreco = document.createElement('input');
+        inputPreco.setAttribute('type', "text");
+        inputPreco.setAttribute('id', "preco");
+        inputPreco.setAttribute('name', "preco");
+        inputPreco.setAttribute('required', true);
+
+        //adiciona o label e o input ao formulario
+        form.appendChild(labelPreco);
+        form.appendChild(inputPreco);
+
+        //📸 Passo 6 – Adicionar o campo Imagem da Salada
+        //criar o figure para a imagem
+        const figureImagem = document.createElement('figure');
+        
+        //cria o label para a imagem
+        const labelImagem = document.createElement('label');
+        labelImagem.setAttribute('for', "imagem");
+        labelImagem.textContent = "Imagem da Salada: ";
+        
+        
+        
+        //cria o input para a imagem
+        const inputImagem = document.createElement('input');
+        inputImagem.setAttribute('type', "file");
+        inputImagem.setAttribute('id', "imagem");
+        inputImagem.setAttribute('name', "imagem");
+        
+        
+        
+        //ficara oculto ate que o usuario escolha uma imagem
+        const imgPreview = document.createElement('img');
+        imgPreview.style.maxWidth = "120px";
+        imgPreview.style.display = "none"; // Oculta a imagem inicialmente
+        
+        //ficara oculto ate ter arquivo
+        const caption = document.createElement('figcaption');
+        caption.textContent = "Pré-visualização da Imagem";
+        
+        figureImagem.appendChild(labelImagem);
+        figureImagem.appendChild(inputImagem);
+        figureImagem.appendChild(imgPreview);
+        figureImagem.appendChild(caption);
+        form.appendChild(figureImagem);
+        
+        //adiciona ao formulario
+      
+
+        //🧱 Passo 7 – Criar o botão de envio "Cadastrar Salada"
+        //criar botao
+        const botao = document.createElement('button');
+        botao.setAttribute('type', "submit");
+        botao.textContent = "Cadastrar Salada";
+
+        //adiciona o botao ao formulario
+        form.appendChild(botao);
+
+        //preview da imagem escolhida
+
+        inputImagem.addEventListener("change", () => {
+            const file = inputImagem.files[0];
+            if (!file)
+                return;
+                const reader = new FileReader();
+                reader.onload = e => {
+                    imgPreview.setAttribute('src', e.target.result);
+                    imgPreview.setAttribute('alt', "Pré-visualização da Imagem");
+                    imgPreview.style.display = "block";
+                }
+                reader.readAsDataURL(file);
+        });
+
+        form.addEventListener('submit', async function(event){
+            event.preventDefault();
+            console.log("formulario pronto interceptado! pronto pra enviar");
+            const formData = new FormData(form);
+            try {
+                const response = await fetch('https://visa-pizzaria-backend.onrender.com/api/saladas', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if(response.ok) {
+                    alert(result.message || "🥗 Salada cadastrada com sucesso!");
+                    form.reset(); // Limpa o formulário
+                    imgPreview.src = ""; // Limpa a imagem pré-visualizada
+                    imgPreview.alt = ""; // Limpa o texto alternativo da imagem
+                } else {
+                    alert("Erro ao cadastrar salada. Tente novamente.");
+                }
+            } catch (errorP) {
+                console.error('Erro: ', error);
+                alert("Erro ao cadastrar salada. Tente novamente.");
+            }
+        });
+    </script>
+</body>
+</html>

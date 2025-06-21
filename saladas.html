@@ -1,17 +1,145 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Saladas | ViSa Pizzaria</title>
-    <link rel="stylesheet" href="main.css">
+    <title>ViSa Saladas</title>
+    <style>
+        /* ---------- CARDS DAS SALADAS ---------- */
+        .card {                           /* já existe – só reforçando estilos */
+            background:#fff;
+            border-radius:8px;
+            box-shadow:0 1px 6px rgba(0,0,0,.08);
+            width:150px;
+            padding:10px;
+            text-align:center;
+            cursor:pointer;
+            transition:.2s;
+        }
+
+        .card:hover { box-shadow:0 4px 16px rgba(0,0,0,.15); }
+
+        /* 🔧 IMAGEM DENTRO DO CARD */
+        .card img {
+            width:100%;
+            height:110px;
+            object-fit:cover;
+            border-radius:6px;
+        }
+
+        /* 🔧 TÍTULO DA SALADA */
+        .card h3 {
+            font-size:1rem;
+            margin:8px 0 4px;
+            color:#333;
+        }
+
+        /* 🔧 PREÇO */
+        .card span {
+            display:block;
+            margin-top:6px;
+            color:#25d366;
+            font-weight:600;
+        }
+
+        /* ---------- LISTA DE INGREDIENTES ---------- */
+        .card ul {           /* remove marcadores e ajusta espaçamento */
+            list-style:none;   /* 🔧 SEM BOLINHAS */
+            padding:0;
+            margin:6px 0;
+        }
+
+        .card ul li {
+            font-size:0.85rem;
+            color:#555;
+            line-height:1.3;
+        }
+
+        /* ---------- RESPONSIVO PARA TELAS PEQUENAS ---------- */
+        @media (max-width:480px) {
+            .card {
+                width: 44vw;                 /* dois cards por linha */
+                padding:8px;
+            }
+            .card h3 {
+                font-size:0.95rem;
+            }
+            .card span {
+                font-size:0.9rem;
+            }
+            .card ul li {
+                font-size:0.78rem;
+            }
+        }
+    </style>
 </head>
 <body>
-    <h1>Saladas</h1>
-    <ul>
-        <li>Salada Caesar</li>
-        <li>Salada Grega</li>
-        <li>Salada de Frutas</li>
-    </ul>
+
+    <!--Titulo Principal-->
+    <h1>ViSa Saladas</h1>
+
+    <!--Lista de Saladas (os cards serao gerados via js)-->
+    <section class="grid" id="saladaLista">...</section>
+
+    <!--MODAL DA SALADA-->
+    <div class="modal-bg" id="modalBg" >
+        <div class="modal">
+            <button class="close" id="fecharModal">✖️</button>
+            <img id="modalImg" src="" alt="">
+            <h2 id="modalNome" >...</h2>
+            <p id="modalIngredientes">...</p>
+            <p id="modalPreco" style="color:#25D366;font-weight:bold;">...</p>
+            <div class="qty-box">
+                <button class="qty-btn" id="menos">-</button>
+                <input type="number" id="qtd" value="0" style="width: 40px; text-align: center">
+                <button class="qty-btn" id="mais" >+</button>
+            </div>
+            <div id="subtotal">Subtotal: R$,00</div>
+            <button id="addCarrinho" >Adicionar ao carrinho</button>
+        </div>
+    </div>
+
+    <script>
+        //seleciona o container onde os cards vao aparecer
+        const saladaLista = document.getElementById('saladaLista');
+        //Requisição GET
+        fetch('https://visa-pizzaria-backend.onrender.com/api/saladas')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Erro ao buscar saladas');
+            }
+            return response.json(); //converte a resposta para json
+        })
+        .then(data => {
+            data.forEach(salada => {
+                const card = document.createElement('div');
+                card.classList.add('card');
+                //quebra a string de ingredientes em array
+                const ingredientesArray = salada.ingredientes.split(',');
+                //monta uma lista nao ordenada com os ingredientes
+                let listaIngredientes = '<ul>';
+                
+                ingredientesArray.forEach(ingrediente => {
+                    listaIngredientes+= `<li>${ingrediente.trim()}</li>`;
+                })
+                
+                //Preenche os dados no card
+                card.innerHTML= `
+                    <img src="${salada.imagemUrl}" alt="${salada.nome}">
+                    <h3>${salada.nome}</h3>
+                    <p>Ingredientes:</p>
+                    ${listaIngredientes}
+                    <span>R$ ${salada.preco}</span>
+                `;
+
+                //Adiciona o card na tela
+                saladaLista.appendChild(card);
+
+            });
+        })
+        .catch(error => {
+            console.error('Erro ao carregar saladas: ', error);
+        });
+    </script>
 </body>
 </html>
