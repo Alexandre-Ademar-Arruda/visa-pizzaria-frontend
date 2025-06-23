@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .btnAddSubtotal {
+            margin-top:8px;
+            padding:6px 12px;
+            background:#43a047;       /* verde */
+            color:#fff;
+            border:none;
+            border-radius:6px;
+            font-size:0.9rem;
+            cursor:pointer;
+        }
+
+        .btnAddSubtotal:hover {
+            background:#2e7d32;
+        }
+
+    </style>
+</head>
+<body>
+    <h1 class="sr-only">ViSa Pizzaria</h1>
+    <div class="subtotal" id="subtotalBox">
+        <h3>Subtotal</h3>
+        <ul id="subtotalList" style="background-color: yellow;" >....</ul>
+        <div class="suttotal-total" id="subtotalTotal" style="background-color: aqua;" >...</div>
+    </div>
+    <main>
+        <section class="pizza-list" id="pizzaList" style="background-color: springgreen;">
+            ...
+        </section>
+    </main>
+
+    <!-- Um card de exemplo (pizza, salada etc.)  -->
+    <article class="item-card">
+    <h3 class="item-nome">Salada Verde</h3>
+    <span class="item-tamanho" data-tam="Única">unidade</span>
+    <span class="item-preco" data-valor="12,50">R$ 12,50</span>
+        <br>
+
+    <!-- BOTÃO ADICIONAR: contém data-attributes para pegar info no JS -->
+    <button class="btnAddSubtotal"
+            data-nome="Salada Verde"
+            data-tamanho="Única"
+            data-valor="12,50">
+            Adicionar
+    </button>
+    </article>
+    <div class="qty-box">
+        <button class="btn-menos" >-</button>
+        <input style="background-color: red;" class="inputQtd" type="text" value="1" min="1">
+        <button class="btn-mais" >+</button>
+    </div>
+    <button class="btnAddSubtotal" data-nome="Salada Verde" data-tamanho="Unica" data-valor="12,50" >
+        Adicionar
+    </button>
+
+
+    <script>
+        let subtotal=[];
+
+    function atualizarSubtotal() {
+        const subtotalBox   = document.getElementById('subtotalBox');
+        const subtotalList  = document.getElementById('subtotalList');
+        const subtotalTotal = document.getElementById('subtotalTotal');
+
+        if (subtotal.length === 0) {
+            subtotalBox.style.display = "none";
+            document.body.classList.remove('comSubtotal');
+            return;
+        }
+        
+        subtotalBox.style.display = 'block';
+        document.body.classList.add('comSubtotal');
+        subtotalList.innerHTML = 'dsd';
+
+        let total = 0;
+
+        subtotal.forEach( (item, ixd) => {
+            subtotalList.innerHTML += `
+                <li>
+                    ${item.nome} (${item.tamanho}): R$ ${item.valor}
+                    <strong>x${item.quantidade}</strong><!--MOSTRAR QUANTIDADE-->
+                    <button type="button" class="btnDelSubtotal" data-idx="${ixd}">🗑️</button>
+                </li>`;
+            total += parseFloat(item.valor.replace(',', '.')) * item.quantidade || 0;
+                
+        });
+
+    }
+     
+    function adicionarSubtotal(nome, tamanho, valor, quantidade = 1){
+        const novoItem = {nome, tamanho, valor, quantidade};
+        subtotal.push(novoItem);
+        atualizarSubtotal();
+    }
+
+        document.querySelectorAll('.btnAddSubtotal').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const nome      = btn.dataset.nome;
+                const tamanho   = btn.dataset.tamanho;
+                const valor     = btn.dataset.valor;
+                
+                const qtdInput  = btn.parentElement.querySelector('.inputQtd');
+                const qtd       = parseInt(qtdInput.value) || 1;
+
+                adicionarSubtotal(nome, tamanho, valor, qtd);
+            
+            });
+        });
+
+    </script>
+</body>
+</html>
+
