@@ -233,6 +233,24 @@
       flex-direction: column;
       align-items: flex-start;
     }
+
+    #btnVoltarCardapio {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 2000;
+      background: #25d366;
+      color: #fff;
+      border: none;
+      border-radius: 50px;
+      padding: 16px 28px;
+      font-size: 1.2rem;
+      font-weight: bold;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.12);
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
     @media (max-width:700px){
       .carrinho-flutuante-btn { left: 50%; }
     }
@@ -262,27 +280,8 @@
   </div>
 
   <!-- Botão flutuante para voltar ao cardápio -->
-  <button id="btnVoltarCardapio"
-      style="
-          position: fixed;
-          bottom: 24px;
-          right: 24px;
-          z-index: 2000;
-          background: #25d366;
-          color: #fff;
-          border: none;
-          border-radius: 50px;
-          padding: 16px 28px;
-          font-size: 1.2rem;
-          font-weight: bold;
-          box-shadow: 0 2px 12px rgba(0,0,0,0.12);
-          cursor: pointer;
-          transition: background 0.2s;
-      "
-      onclick="window.location.href='index.html'"
-      aria-label="Voltar para o cardápio"
-  >
-    ⬅️ Voltar
+  <button id="btnVoltarCardapio" onclick="window.location.href='index.html'" aria-label="Voltar para o cardápio">
+    ⬅️ MENU
   </button>
 
   <!-- Carrinho flutuante global -->
