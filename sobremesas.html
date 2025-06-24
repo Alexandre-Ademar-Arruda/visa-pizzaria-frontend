@@ -81,7 +81,7 @@ h1{margin:0}
     <strong style="font-size:1.15rem;color:#25d366">🛒 Carrinho</strong>
     <button id="fecharCarrinho">✖️</button>
   </div>
-  <ul id="listaCarrinho"></ul>
+  <ul id="listaCarrinho">...</ul>
   <div id="carrinhoTotal"></div>
   <button id="btnFinalizar">Finalizar Pedido</button>
 </div>
@@ -177,13 +177,22 @@ function atualizarCarrinhoUI(){
     listaEl.innerHTML='<li style="color:#888">Seu carrinho está vazio.</li>';
     totalEl.textContent='';return;
   }
-  let total=0;listaEl.innerHTML='';
+  let total=0;
+  listaEl.innerHTML='';
   carrinho.forEach((it,idx)=>{
     const precoNum=parseFloat((it.preco||'0').toString().replace(',','.'));
     total+=precoNum*it.quantidade;
-    listaEl.innerHTML+=`<li>${it.nome} x${it.quantidade} — R$ ${(precoNum*it.quantidade).toFixed(2).replace('.',',')}
-      <button style="border:none;background:none;color:#e53935;font-size:1em;cursor:pointer"
-        onclick="removerDoCarrinho(${idx})">🗑️</button></li>`;
+    listaEl.innerHTML += `
+      <li style="margin-bottom:8px;display:flex;align-items:center;gap:8px;">
+        ${it.imagem ? `<img src="${it.imagem}" alt="" style="width:32px;height:32px;object-fit:cover;border-radius:4px;">` : ''}
+        <div style="flex:1;">
+          <strong>${it.nome}</strong> x${it.quantidade}<br>
+          <span style="font-size:0.97em;">R$ ${(precoNum * it.quantidade).toFixed(2).replace('.', ',')}</span>
+        </div>
+        <button style="border:none;background:none;color:#e53935;font-size:1em;cursor:pointer"
+          onclick="removerDoCarrinho(${idx})">🗑️</button>
+      </li>`;
+
   });
   totalEl.textContent='Total: R$ '+total.toFixed(2).replace('.',',');
 }

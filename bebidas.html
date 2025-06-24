@@ -258,7 +258,7 @@
 </head>
 <body>
   <h1>Bebidas</h1>
-  <section class="grid-bebidas" id="gridBebidas"></section>
+  <section class="grid-bebidas" id="gridBebidas">...</section>
 
   <!-- Modal de detalhes da bebida -->
   <div class="modal-bg" id="modalBg">
@@ -290,7 +290,7 @@
       <strong style="font-size:1.15rem;color:#25d366;">🛒 Carrinho</strong>
       <button id="fecharCarrinho" style="background:none;border:none;font-size:1.3rem;cursor:pointer;color:#e53935;">✖️</button>
     </div>
-    <ul id="listaCarrinho" style="list-style:none;padding:0;margin:12px 0 0 0;width:100%;"></ul>
+    <ul id="listaCarrinho" style="list-style:none;padding:0;margin:12px 0 0 0;width:100%;">...</ul>
     <div id="carrinhoTotal" style="margin:10px 0 0 0;font-weight:bold;color:#222;"></div>
     <button id="btnFinalizar" style="margin-top:14px;background:#25d366;color:#fff;border:none;border-radius:6px;padding:10px 0;width:100%;font-size:1.1rem;cursor:pointer;">Finalizar Pedido</button>
   </div>
@@ -340,7 +340,7 @@
         total += precoNum * item.quantidade;
         lista.innerHTML += `
           <li style="margin-bottom:8px;display:flex;align-items:center;gap:8px;">
-            ${item.imagem ? `<img src="https://visa-pizzaria-backend.onrender.com${item.imagem}" alt="" style="width:32px;height:32px;object-fit:cover;border-radius:4px;">` : ''}
+            ${item.imagem ? `<img src="${item.imagem}" alt="" style="width:32px;height:32px;object-fit:cover;border-radius:4px;">` : ''}
             <div style="flex:1;">
               <span style="font-size:0.97em;color:#25d366;">${item.tipo || 'Bebida'}</span><br>
               <strong>${item.nome}</strong> x${item.quantidade}<br>
@@ -434,7 +434,7 @@
 
       document.getElementById('btnAdicionar').onclick = () => {
         const qtd = parseInt(document.getElementById('modalQtd').value) || 1;
-        adicionarAoCarrinho({
+        window.adicionarAoCarrinho({
           tipo: 'Bebida',
           nome: bebida.nome,
           imagem: bebida.imagem,
