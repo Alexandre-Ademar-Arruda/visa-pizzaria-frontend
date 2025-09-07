@@ -471,20 +471,41 @@
         document.getElementById('carrinhoFlutuante').style.display = 'none';
     };
 
-    async function carregarPizzas(){
-        const resp=await fetch('https://visa-pizzaria-backend.onrender.com/api/pizzas');
-        const pizzas=await resp.json();
-        const lista=document.getElementById('pizzaList');
-        lista.innerHTML='';
-        pizzas.forEach((p,idx)=>{
-            lista.innerHTML+=`<article class="pizza-card" itemscope itemtype="https://schema.org/Product">
-                ${p.imagem?`<img src="https://visa-pizzaria-backend.onrender.com${p.imagem}" alt="Pizza ${p.nome}" itemprop="image" data-idx="${idx}" onerror="setTimeout(()=>{this.src='https://visa-pizzaria-backend.onrender.com${p.imagem}';},4000)">`:`<div style="width:240px;height:180px;background:#eee;display:flex;align-items:center;justify-content:center;">Sem imagem</div>`}
+    async function carregarPizzas() {
+        const resp = await fetch('https://visa-pizzaria-backend.onrender.com/api/pizzas');
+        const pizzas = await resp.json();
+        const lista = document.getElementById('pizzaList');
+        lista.innerHTML = '';
+
+        pizzas.forEach((p, idx) => {
+            // Define a fonte da imagem corretamente
+            let imgSrc = '';
+            
+            if (p.imagem && p.imagem.startsWith('data:')) {
+                // Se já tiver prefixo data:, usa direto
+                imgSrc = p.imagem;
+            } else if (p.imagem) {
+                // Se for Base64 puro, adiciona o prefixo
+                imgSrc = `data:image/jpeg;base64,${p.imagem}`;
+            }
+
+            lista.innerHTML += `
+            <article class="pizza-card" itemscope itemtype="https://schema.org/Product">
+                ${imgSrc ? `<img src="${imgSrc}" alt="Pizza ${p.nome}" itemprop="image" data-idx="${idx}">` 
+                        : `<div style="width:240px;height:180px;background:#eee;display:flex;align-items:center;justify-content:center;">Sem imagem</div>`}
                 <h2 itemprop="name">${p.nome}</h2>
             </article>`;
         });
-        document.querySelectorAll('.pizza-card img').forEach(img=>img.addEventListener('click',()=>abrirModal(pizzas[img.dataset.idx])));
-        inserirBotaoCarrinho(); // <-- insere o botão após carregar as pizzas
+
+        // Adiciona evento para abrir modal
+        document.querySelectorAll('.pizza-card img').forEach(img => 
+            img.addEventListener('click', () => abrirModal(pizzas[img.dataset.idx]))
+        );
+
+        // Insere o botão do carrinho
+        inserirBotaoCarrinho();
     }
+
 
     document.addEventListener('DOMContentLoaded',()=>{
         document.getElementById('fecharModal').onclick=fecharModal;
