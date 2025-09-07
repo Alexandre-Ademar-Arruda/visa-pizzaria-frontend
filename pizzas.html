@@ -365,7 +365,7 @@
     function fecharSubtotalModal(){document.getElementById('modalSubtotalBg').classList.remove('active');}
 
     function abrirModal(pizza){
-        document.getElementById('modalImg').src='https://visa-pizzaria-backend.onrender.com'+pizza.imagem;
+        document.getElementById('modalImg').src= pizza.imagem;
         document.getElementById('modalImg').alt='Pizza '+pizza.nome;
         document.getElementById('modalNome').textContent=pizza.nome;
 
@@ -410,7 +410,7 @@
                         tamanho: tamanhos[idx].nome,
                         preco: tamanhos[idx].valor,
                         quantidade: qtd,
-                        imagem: 'https://visa-pizzaria-backend.onrender.com' + pizza.imagem
+                        imagem: pizza.imagem
                     });
                     fecharModal();
                     //alert(`${qtd} pizza(s) adicionada(s) ao carrinho!`);
