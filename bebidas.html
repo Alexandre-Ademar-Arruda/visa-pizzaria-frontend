@@ -408,7 +408,7 @@
 
     // Função para abrir o modal com detalhes da bebida
     function abrirModal(bebida) {
-      document.getElementById('modalImg').src = 'https://visa-pizzaria-backend.onrender.com' + bebida.imagem;
+      document.getElementById('modalImg').src = bebida.base64_imagem;
       document.getElementById('modalImg').alt = bebida.nome;
       document.getElementById('modalNomeTexto').textContent = bebida.nome;
       document.getElementById('modalPreco').textContent = 'R$ ' + bebida.preco;
@@ -440,7 +440,7 @@
           imagem: bebida.imagem,
           quantidade: qtd,
           preco: bebida.preco,
-          imagem: 'https://visa-pizzaria-backend.onrender.com' + bebida.imagem
+          imagem: bebida.base64_imagem
         });
         fecharModal();
       };
@@ -466,7 +466,7 @@
         const card = document.createElement('div');
         card.className = 'bebida-card';
         card.innerHTML = `
-          <img src="https://visa-pizzaria-backend.onrender.com${bebida.imagem}" alt="${bebida.nome}">
+          <img src="${bebida.base64_imagem}" alt="${bebida.nome}">
           <div class="bebida-nome">${bebida.nome}</div>
         `;
         card.onclick = () => abrirModal(bebida);
