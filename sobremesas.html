@@ -105,7 +105,7 @@ buscarSobremesas().then(arr=>{
   arr.forEach((s,i)=>{
     grid.insertAdjacentHTML('beforeend',`
       <article class="card pizza-card" data-idx="${i}">
-        <img src="https://visa-pizzaria-backend.onrender.com${s.imagem}" alt="${s.nome}">
+        <img src="${s.imagem}" alt="${s.nome}">
         <h3>${s.nome}</h3>
         <span>R$ ${(+s.preco).toFixed(2).replace('.',',')}</span>
       </article>`);
@@ -125,7 +125,7 @@ let itemAtual=null;
 grid.addEventListener('click',e=>{
   const card=e.target.closest('.pizza-card');if(!card)return;
   itemAtual=lista[card.dataset.idx];
-  mImg.src='https://visa-pizzaria-backend.onrender.com'+itemAtual.imagem;
+  mImg.src=+itemAtual.imagem;
   mNome.textContent=itemAtual.nome;
   mPreco.textContent='Preço: R$ '+(+itemAtual.preco).toFixed(2).replace('.',',');
   qtdInput.value=1;atualizarSubtotal();modalBg.classList.add('active');
@@ -161,7 +161,7 @@ document.getElementById('addCarrinho').onclick=()=>{
       tamanho:'',
       preco:itemAtual.preco,
       quantidade:1,
-      imagem:'https://visa-pizzaria-backend.onrender.com'+itemAtual.imagem
+      imagem:itemAtual.imagem
     });
   }
   modalBg.classList.remove('active');
