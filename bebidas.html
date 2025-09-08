@@ -354,7 +354,7 @@
       //carrinhoDiv.style.display = 'flex'; // alterado para mostrar o carrinho apenas quando clicado
     }
 
-    // ALTERAÇÃO: Sempre deixa o carrino oculto inicialmente
+   //sempre deixa o carrinho invisível ao carregar a página
     document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('carrinhoFlutuante').style.display = 'none';
     });
@@ -408,7 +408,7 @@
 
     // Função para abrir o modal com detalhes da bebida
     function abrirModal(bebida) {
-      document.getElementById('modalImg').src = bebida.base64_imagem;
+      document.getElementById('modalImg').src = bebida.imagem;
       document.getElementById('modalImg').alt = bebida.nome;
       document.getElementById('modalNomeTexto').textContent = bebida.nome;
       document.getElementById('modalPreco').textContent = 'R$ ' + bebida.preco;
@@ -465,7 +465,7 @@
         const card = document.createElement('div');
         card.className = 'bebida-card';
         card.innerHTML = `
-          <img src="${bebida.base64_imagem}" alt="${bebida.nome}">
+          <img src="${bebida.imagem}" alt="${bebida.nome}">
           <div class="bebida-nome">${bebida.nome}</div>
         `;
         card.onclick = () => abrirModal(bebida);

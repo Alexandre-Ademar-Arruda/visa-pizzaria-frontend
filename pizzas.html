@@ -177,9 +177,7 @@
         <button id="btnEnviarZapSubtotal" style="margin-top:10px;background:#25d366;color:#fff;">Enviar Pedido no WhatsApp</button>
     </div>
     <main>
-        <section class="pizza-list" id="pizzaList">
-            <!-- O botão do carrinho será inserido via JS acima da segunda pizza -->
-        </section>
+        <section class="pizza-list" id="pizzaList">...</section>
     </main>
     <div class="modal-bg" id="modalBg">
         <div class="modal" id="modalPizza">
@@ -274,17 +272,18 @@
       //carrinhoDiv.style.display = 'flex'; // REMOVIDO: só mostra ao clicar no botão
     }
 
-    // ALTERAÇÃO: Sempre deixa o carrinho invisível ao carregar a página
-
-    document.getElementById('fecharCarrinho').onclick = () => {
-      document.getElementById('carrinhoFlutuante').style.display = 'none';
-    };
-
+    
     //sempre deixa o carrinho invisível ao carregar a página
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('carrinhoFlutuante').style.display = 'none';
     });
-
+    
+    
+    //Sempre deixa o carrinho invisível ao carregar a página
+    document.getElementById('fecharCarrinho').onclick = () => {
+      document.getElementById('carrinhoFlutuante').style.display = 'none';
+      atualizarCarrinhoUI();
+    };
 
     // ...existing code...
     document.getElementById('btnFinalizar').onclick = () => {
